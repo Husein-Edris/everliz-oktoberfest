@@ -1,0 +1,59 @@
+.everliz-reservation-form {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.everliz-reservation-form form {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.everliz-reservation-form .form-group {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.everliz-reservation-form label {
+    color: white;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.everliz-reservation-form select,
+.everliz-reservation-form input[type="date"] {
+    background: white;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 20px;
+    min-width: 200px;
+    height: 48px;
+}
+
+.everliz-reservation-form .reservation-submit {
+    background-color: #F7941D;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 30px;
+    height: 48px;
+    font-weight: 500;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.everliz-reservation-form .reservation-submit:hover {
+    background-color: #e88710;
+}
+
+/* Fix date input placeholder */
+.everliz-reservation-form input[type="date"]::-webkit-datetime-edit-text,
+.everliz-reservation-form input[type="date"]::-webkit-datetime-edit-month-field,
+.everliz-reservation-form input[type="date"]::-webkit-datetime-edit-day-field,
+.everliz-reservation-form input[type="date"]::-webkit-datetime-edit-year-field {
+    color: #757575;
+}

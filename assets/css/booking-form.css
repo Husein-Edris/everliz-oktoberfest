@@ -1,0 +1,33 @@
+/* Rename this file to reservation-form.css */
+.everliz-reservation-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.everliz-reservation-form .form-group {
+    margin-bottom: 15px;
+}
+
+.everliz-reservation-form select,
+.everliz-reservation-form input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.everliz-reservation-form .reservation-submit {
+    width: 100%;
+    padding: 12px;
+    background-color: #0073aa;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.everliz-reservation-form .reservation-submit:hover {
+    background-color: #005177;
+}

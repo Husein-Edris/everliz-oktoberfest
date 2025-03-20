@@ -1,0 +1,214 @@
+.booking-form-container {
+    color: $text-color;
+    background-color: $dark-bg;
+    padding: $spacing-xl;
+    max-width: $container-lg;
+    margin: 0 auto;
+    font-family: $font-family;
+    
+    .year-nav {
+      @include flex(row, center, center);
+      margin-bottom: $spacing-md;
+      
+      h2 {
+        margin: 0 $spacing-md;
+      }
+    }
+    
+    .prev-year,
+    .next-year {
+      cursor: pointer;
+      padding: $spacing-sm;
+    }
+    
+    .required-field {
+      &::after {
+        content: " *";
+        color: $error-color;
+      }
+    }
+    
+    .calendar-wrapper {
+      background-color: $dark-bg-lighter;
+      border-radius: $border-radius-lg;
+      padding: $spacing-md;
+      margin-bottom: $spacing-xl;
+    }
+    
+    .month-header {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: $spacing-md;
+    }
+    
+    .calendar-grid {
+      display: grid;
+      grid-template-rows: auto auto;
+    }
+    
+    .calendar-days,
+    .calendar-dates {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+    }
+    
+    .calendar-days div {
+      padding: $spacing-sm;
+      font-weight: bold;
+    }
+    
+    .calendar-dates div {
+      padding: $spacing-sm;
+      cursor: pointer;
+      
+      &.selected {
+        background-color: $highlight-color;
+        border-radius: 50%;
+      }
+    }
+    
+    .form-row {
+      @include flex(row, space-between, flex-start, $spacing-md);
+      margin-bottom: $spacing-lg;
+      
+      @include mobile {
+        @include flex(column, flex-start, stretch, $spacing-sm);
+      }
+    }
+    
+    .form-group {
+      margin-bottom: $spacing-lg;
+      width: 100%;
+      
+      &.half {
+        width: 50%;
+        
+        @include mobile {
+          width: 100%;
+        }
+      }
+      
+      &.checkbox {
+        @include flex(row, flex-start, center);
+        
+        input {
+          margin-right: $spacing-sm;
+          width: auto;
+        }
+      }
+    }
+    
+    label {
+      display: block;
+      margin-bottom: $spacing-sm;
+    }
+    
+    select,
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    textarea {
+      @include form-field;
+    }
+    
+    .section-title {
+      font-size: $font-size-lg;
+      margin-bottom: $spacing-md;
+    }
+    
+    .tent-preference {
+      margin-bottom: $spacing-lg;
+    }
+    
+    .preference-option {
+      margin-bottom: $spacing-md;
+      background-color: $dark-bg-lighter;
+      border-radius: $border-radius-lg;
+      padding: $spacing-md;
+      
+      input[type="radio"] {
+        margin-right: $spacing-sm;
+      }
+    }
+    
+    .preference-description {
+      margin-top: $spacing-sm;
+      margin-left: $spacing-lg;
+      color: $text-muted;
+    }
+    
+    .tent-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: $spacing-md;
+      margin-bottom: $spacing-xl;
+    }
+    
+    .tent-card {
+      cursor: pointer;
+      border-radius: $border-radius-lg;
+      overflow: hidden;
+      position: relative;
+      height: 100px;
+      
+      &.selected {
+        border: 2px solid $highlight-color;
+      }
+    }
+    
+    .tent-image {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    
+    .tent-name {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: $spacing-sm;
+      font-size: $font-size-sm;
+    }
+    
+    .contact-section h3 {
+      margin-bottom: $spacing-lg;
+    }
+    
+    .form-submit {
+      margin-top: $spacing-xl;
+      margin-bottom: $spacing-xl;
+    }
+    
+    .submit-button {
+      @include button($highlight-color, #000, darken($highlight-color, 10%));
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-sm;
+    }
+    
+    .support-section {
+      text-align: center;
+      margin-top: $spacing-xl;
+    }
+    
+    .call-button {
+      background-color: transparent;
+      border: 1px solid $text-color;
+      color: $text-color;
+      padding: $spacing-sm $spacing-md;
+      border-radius: $border-radius;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-sm;
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }

@@ -61,27 +61,53 @@ class Reservation_Form_Widget extends \Elementor\Widget_Base {
 
     protected function render() {
         $settings = $this->get_settings_for_display();
+        $booking_page_url = home_url('/booking-page/'); // Change this to your actual booking page URL
         ?>
 <div class="everliz-reservation-form">
-    <form id="reservation-form" method="GET" action="<?php echo esc_url(home_url('/')); ?>">
+    <form id="reservation-form" method="GET" action="<?php echo esc_url($booking_page_url); ?>">
         <div class="form-group">
             <label>Select Date</label>
-            <input type="date" name="booking_date" id="booking_date" required>
+            <input type="date" name="date" id="booking_date" required>
         </div>
         <div class="form-group">
             <label>Select Location</label>
-            <select name="tent" id="tent" required>
-                <option value="">TENTS</option>
+            <select name="location" id="tent" required>
+                <option value=""><?php echo esc_html($settings['location_placeholder']); ?></option>
+                <option value="any">Any Tent</option>
                 <option value="hofbrau">Hofbräu-Festzelt</option>
                 <option value="augustiner">Augustiner-Festhalle</option>
                 <option value="paulaner">Paulaner-Festzelt</option>
             </select>
         </div>
         <button type="submit" class="reservation-submit">
-            Request
+            <?php echo esc_html($settings['button_text']); ?>
         </button>
     </form>
 </div>
+
+<script>
+jQuery(document).ready(function($) {
+    $('#reservation-form').on('submit', function(e) {
+        e.preventDefault();
+
+        // Get form values
+        const date = $('#booking_date').val();
+        const location = $('#tent').val();
+
+        // Base64 encode the values as specified in the requirements
+        const encodedDate = btoa(date);
+        const encodedLocation = btoa(location);
+
+        // Construct the URL with parameters
+        const bookingUrl = '<?php echo esc_url($booking_page_url); ?>' +
+            '?date=' + encodedDate +
+            '&location=' + encodedLocation;
+
+        // Redirect to booking page
+        window.location.href = bookingUrl;
+    });
+});
+</script>
 <?php
     }
 }

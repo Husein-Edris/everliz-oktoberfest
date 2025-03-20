@@ -1,0 +1,62 @@
+.everliz-reservation-form {
+    max-width: $container-md;
+    margin: 0 auto;
+    padding: $spacing-xl;
+    
+    form {
+      @include flex(row, center, flex-end, $spacing-md);
+      
+      @include mobile {
+        @include flex(column, center, stretch, $spacing-sm);
+      }
+    }
+    
+    .form-group {
+      margin: 0;
+      @include flex(column, flex-start, flex-start, $spacing-xs);
+      
+      @include mobile {
+        width: 100%;
+      }
+    }
+    
+    label {
+      color: $text-color;
+      font-size: $font-size-sm;
+      margin-bottom: $spacing-xs;
+    }
+    
+    select,
+    input[type="date"] {
+      background: white;
+      border: none;
+      border-radius: $border-radius;
+      padding: 12px 20px;
+      min-width: 200px;
+      height: 48px;
+      
+      @include mobile {
+        width: 100%;
+      }
+    }
+    
+    .reservation-submit {
+      @include button($primary-color, $text-color, $primary-hover);
+      height: 48px;
+      text-transform: uppercase;
+      
+      @include mobile {
+        width: 100%;
+      }
+    }
+    
+    /* Fix date input placeholder */
+    input[type="date"] {
+      &::-webkit-datetime-edit-text,
+      &::-webkit-datetime-edit-month-field,
+      &::-webkit-datetime-edit-day-field,
+      &::-webkit-datetime-edit-year-field {
+        color: #757575;
+      }
+    }
+  }

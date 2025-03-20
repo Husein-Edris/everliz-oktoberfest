@@ -1,0 +1,55 @@
+// Flexbox
+@mixin flex($direction: row, $justify: center, $align: center, $gap: 0) {
+    display: flex;
+    flex-direction: $direction;
+    justify-content: $justify;
+    align-items: $align;
+    @if $gap > 0 {
+      gap: $gap;
+    }
+  }
+  
+  // Media queries
+  @mixin mobile {
+    @media (max-width: 767px) {
+      @content;
+    }
+  }
+  
+  @mixin tablet {
+    @media (min-width: 768px) and (max-width: 1023px) {
+      @content;
+    }
+  }
+  
+  @mixin desktop {
+    @media (min-width: 1024px) {
+      @content;
+    }
+  }
+  
+  // Button styles
+  @mixin button($bg-color, $text-color, $hover-color) {
+    background-color: $bg-color;
+    color: $text-color;
+    border: none;
+    border-radius: $border-radius;
+    padding: 0.75rem 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: $hover-color;
+    }
+  }
+  
+  // Form field styles
+  @mixin form-field {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid $border-color;
+    background-color: $dark-bg-lighter;
+    border-radius: $border-radius;
+    color: $text-color;
+  }

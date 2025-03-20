@@ -1,78 +1,288 @@
 <?php
+/**
+ * API Handler Class
+ * 
+ * Manages communication with the external API for the Oktoberfest VIP booking system.
+ */
 
-namespace Everliz_Oktoberfest;
+namespace Oktoberfest_VIP;
 
-class Api_Handler
-{
+if (!defined('ABSPATH')) exit; // Exit if accessed directly
+
+class API_Handler {
+    /**
+     * @var API_Handler Singleton instance
+     */
     private static $instance = null;
+    
+    /**
+     * @var string API base URL
+     */
     private $api_base_url;
+    
+    /**
+     * @var string API key
+     */
     private $api_key;
-
-    public static function instance()
-    {
+    
+    /**
+     * Get singleton instance
+     * 
+     * @return API_Handler
+     */
+    public static function instance() {
         if (null === self::$instance) {
             self::$instance = new self();
         }
         return self::$instance;
     }
-
-    private function __construct()
-    {
-        $options = get_option('Everliz_Oktoberfest');
-        $this->api_base_url = isset($options['api_url']) ? $options['api_url'] : '';
+    
+    /**
+     * Constructor
+     */
+    private function __construct() {
+        $options = get_option('oktoberfest_vip_settings', []);
+        $this->api_base_url = isset($options['api_url']) ? rtrim($options['api_url'], '/') : '';
         $this->api_key = isset($options['api_key']) ? $options['api_key'] : '';
     }
-
-    public function get_locations()
-    {
-        // Will be replaced with API call
+    
+    /**
+     * Check if API is configured
+     * 
+     * @return bool
+     */
+    public function is_configured() {
+        return !empty($this->api_base_url) && !empty($this->api_key);
+    }
+    
+    /**
+     * Get available locations
+     * 
+     * @return array
+     */
+    public function get_locations() {
         return $this->make_request('GET', '/locations');
     }
-
-    public function get_available_tents($location, $date)
-    {
-        return $this->make_request('GET', '/tents', [
-            'location' => $location,
+    
+    /**
+     * Get available sessions for a date
+     * 
+     * @param string $date Date in Y-m-d format
+     * @return array
+     */
+    public function get_sessions($date) {
+        return $this->make_request('GET', '/sessions', [
             'date' => $date
         ]);
     }
-
-    private function make_request($method, $endpoint, $params = [])
-    {
-        if (!$this->api_base_url || !$this->api_key) {
-            return $this->get_dummy_data($endpoint);
-        }
-
-        // Real API call implementation here
-        return [];
+    
+    /**
+     * Get attendee options
+     * 
+     * @return array
+     */
+    public function get_attendee_options() {
+        return $this->make_request('GET', '/attendees');
     }
-
-    private function get_dummy_data($endpoint)
-    {
+    
+    /**
+     * Get tent information
+     * 
+     * @param string $location Location ID (optional)
+     * @param string $date Date in Y-m-d format (optional)
+     * @return array
+     */
+    public function get_tents($location = '', $date = '') {
+        $params = [];
+        
+        if (!empty($location)) {
+            $params['location'] = $location;
+        }
+        
+        if (!empty($date)) {
+            $params['date'] = $date;
+        }
+        
+        return $this->make_request('GET', '/tents', $params);
+    }
+    
+    /**
+     * Submit booking
+     * 
+     * @param array $booking_data Booking data
+     * @return array
+     */
+    public function submit_booking($booking_data) {
+        return $this->make_request('POST', '/bookings', $booking_data);
+    }
+    
+    /**
+     * Make API request
+     * 
+     * @param string $method HTTP method (GET, POST, etc.)
+     * @param string $endpoint API endpoint
+     * @param array $params Parameters
+     * @return array Response data
+     */
+    private function make_request($method, $endpoint, $params = []) {
+        // Use dummy data if API is not configured
+        if (!$this->is_configured()) {
+            return $this->get_dummy_data($endpoint, $params);
+        }
+        
+        $url = $this->api_base_url . $endpoint;
+        
+        $args = [
+            'method' => $method,
+            'timeout' => 30,
+            'redirection' => 5,
+            'httpversion' => '1.1',
+            'blocking' => true,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->api_key,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+        ];
+        
+        if ('GET' === $method && !empty($params)) {
+            $url = add_query_arg($params, $url);
+        } elseif ('POST' === $method && !empty($params)) {
+            $args['body'] = json_encode($params);
+        }
+        
+        $response = wp_remote_request($url, $args);
+        
+        // Check for errors
+        if (is_wp_error($response)) {
+            error_log('Oktoberfest VIP API Error: ' . $response->get_error_message());
+            return [
+                'success' => false,
+                'message' => $response->get_error_message()
+            ];
+        }
+        
+        $response_code = wp_remote_retrieve_response_code($response);
+        
+        if ($response_code < 200 || $response_code >= 300) {
+            error_log('Oktoberfest VIP API Error: ' . $response_code);
+            return [
+                'success' => false,
+                'message' => 'API returned error code: ' . $response_code
+            ];
+        }
+        
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+        
+        if (!$data) {
+            error_log('Oktoberfest VIP API Error: Invalid JSON response');
+            return [
+                'success' => false,
+                'message' => 'Invalid API response'
+            ];
+        }
+        
+        return [
+            'success' => true,
+            'data' => $data
+        ];
+    }
+    
+    /**
+     * Get dummy data for development/testing
+     * 
+     * @param string $endpoint API endpoint
+     * @param array $params Parameters
+     * @return array Dummy data
+     */
+    private function get_dummy_data($endpoint, $params = []) {
         $dummy_data = [
             '/locations' => [
-                ['id' => 'munich', 'name' => 'Munich Central'],
-                ['id' => 'bavaria', 'name' => 'Bavaria Ground'],
-                ['id' => 'stuttgart', 'name' => 'Stuttgart Field']
+                'success' => true,
+                'data' => [
+                    ['id' => 'munich', 'name' => 'Munich Central'],
+                    ['id' => 'bavaria', 'name' => 'Bavaria Ground'],
+                    ['id' => 'any', 'name' => 'Any Location']
+                ]
             ],
-            '/tables' => [
-                
-                    'id' => 'vip1',
-                    'name' => 'VIP Evening Table',
-                    'capacity' => 10,
-                    'time_slot' => '18:00-23:00',
-                    'includes' => ['Reserved seating', 'Personal guide', 'Welcome drinks']
-                ],
-            '/tables' => [
-                
-                    'id' => 'vip2',
-                    'name' => 'VIP Evening Table 2',
-                    'capacity' => 10,
-                    'time_slot' => '18:00-23:00',
-                    'includes' => ['Reserved seating', 'Personal guide', 'Welcome drinks']
-                ],
+            '/sessions' => [
+                'success' => true,
+                'data' => [
+                    ['id' => 'day', 'name' => 'Day session (approx. 8 am – 4 pm)'],
+                    ['id' => 'evening', 'name' => 'Evening session (approx. 5 pm – 11 pm)']
+                ]
+            ],
+            '/attendees' => [
+                'success' => true,
+                'data' => [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20]
+            ],
+            '/tents' => [
+                'success' => true,
+                'data' => [
+                    [
+                        'id' => 'armbrustschutzenzelt',
+                        'name' => 'Armbrustschützenzelt',
+                        'capacity' => 5000,
+                        'image' => 'armbrustschutzenzelt.jpg',
+                        'description' => 'Traditional tent with crossbow shooting competition.'
+                    ],
+                    [
+                        'id' => 'augustiner',
+                        'name' => 'Augustiner-Festhalle',
+                        'capacity' => 6000,
+                        'image' => 'augustiner.jpg',
+                        'description' => 'Famous for its Augustiner beer served from wooden barrels.'
+                    ],
+                    [
+                        'id' => 'fischer-vroni',
+                        'name' => 'Fischer-Vroni',
+                        'capacity' => 3000,
+                        'image' => 'fischer-vroni.jpg',
+                        'description' => 'Known for its fish specialties including "Steckerlfisch".'
+                    ],
+                    [
+                        'id' => 'hacker-festzelt',
+                        'name' => 'Hacker-Festzelt',
+                        'capacity' => 7000,
+                        'image' => 'hacker-festzelt.jpg',
+                        'description' => 'Also known as "Himmel der Bayern" (Heaven of Bavarians).'
+                    ],
+                    [
+                        'id' => 'hofbrau',
+                        'name' => 'Hofbräu-Festzelt',
+                        'capacity' => 6000,
+                        'image' => 'hofbrau.jpg',
+                        'description' => 'Popular with international visitors and known for party atmosphere.'
+                    ],
+                    [
+                        'id' => 'kafer-wiesn-schanke',
+                        'name' => 'Käfer Wiesn-Schänke',
+                        'capacity' => 3000,
+                        'image' => 'kafer-wiesn-schanke.jpg',
+                        'description' => 'Upscale tent popular with celebrities and VIPs.'
+                    ]
+                ]
+            ],
+            '/bookings' => [
+                'success' => true,
+                'data' => [
+                    'booking_id' => 'BK' . rand(10000, 99999),
+                    'status' => 'pending',
+                    'message' => 'Booking received successfully'
+                ]
+            ]
         ];
-
-        return $dummy_data[$endpoint] ?? [];
+        
+        // Return dummy data for the specified endpoint
+        if (isset($dummy_data[$endpoint])) {
+            return $dummy_data[$endpoint];
+        }
+        
+        // Default dummy response
+        return [
+            'success' => false,
+            'message' => 'Endpoint not found in dummy data'
+        ];
     }
 }

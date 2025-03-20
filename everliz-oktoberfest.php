@@ -66,6 +66,14 @@ class Oktoberfest_VIP_Booking
             $css_version,
             true
         );
+
+        wp_enqueue_script(
+            'oktoberfest-calendar',
+            plugin_dir_url(__FILE__) . 'assets/js/calendar.js',
+            ['jquery'],
+            filemtime(plugin_dir_path(__FILE__) . 'assets/js/calendar.js'),
+            true
+        );
     }
 
     public function register_widgets($widgets_manager)

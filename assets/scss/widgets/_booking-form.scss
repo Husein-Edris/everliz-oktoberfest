@@ -1,6 +1,5 @@
 .booking-form-container {
     color: $text-color;
-    background-color: $dark-bg;
     padding: $spacing-xl;
     max-width: $container-lg;
     margin: 0 auto;
@@ -33,10 +32,11 @@
     }
 
     .calendar-wrapper {
-        background-color: $dark-bg-lighter;
+        width: 700px;
         border-radius: $border-radius-lg;
         padding: $spacing-md;
-        margin-bottom: $spacing-xl;
+        margin: $spacing-xl auto;
+        border: 2px solid #272E3B;
     }
 
     .month-header {

@@ -1,78 +1,85 @@
+// Global STYLES 
 .calendar-wrapper {
-    background-color: #111827;
-    border-radius: 0.5rem;
     overflow: hidden;
-    margin-bottom: 2rem;
 
+    // Year navigation
     .year-nav {
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 1.5rem 0;
 
         h2 {
-            margin: 0 2rem;
             color: #F59E0B;
-            font-size: 2rem;
+            margin: 0;
         }
 
         .prev-year,
         .next-year {
             cursor: pointer;
-            padding: 0.5rem;
             color: #F59E0B;
-            font-size: 1.5rem;
 
             &:hover {
                 opacity: 0.8;
             }
+
+            &.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
         }
     }
 
-    .calendar-month {
-        margin-bottom: 0;
+    // Calendar instruction
+    .calendar-instruction {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.8);
+    }
 
+    // Month container
+    .calendar-month {
+
+        // Month header
         .month-header {
             text-align: center;
-            font-weight: bold;
-            padding: 0.75rem;
+            font-weight: 400;
             background-color: rgba(255, 255, 255, 0.05);
             color: rgba(255, 255, 255, 0.8);
         }
 
+        // Days of week header
         .calendar-days {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 
             div {
-                padding: 0.75rem 0.5rem;
                 font-weight: bold;
                 color: rgba(255, 255, 255, 0.6);
             }
         }
 
+        // Calendar dates grid
         .calendar-dates {
             display: grid;
             justify-items: center !important;
             grid-template-columns: repeat(7, 1fr);
             text-align: center;
-            padding: 0.5rem;
+            gap: 1rem 0;
+            margin-bottom: 1rem;
 
             div {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                margin: 0.25rem;
-                height: 2.5rem;
-                width: 2.5rem;
                 border-radius: 50%;
 
+
+                // Empty cells
                 &.empty {
-                    visibility: hidden;
+                    display: none; // Can use visibility: hidden if grid spacing is needed
                 }
 
+                // Selectable dates
                 &.in-range {
                     cursor: pointer;
                     color: #fff;
@@ -83,15 +90,192 @@
                     }
                 }
 
+                // Disabled dates
                 &.disabled {
                     color: rgba(255, 255, 255, 0.3);
                     cursor: not-allowed;
                 }
 
+                // Selected date
                 &.selected {
                     background-color: #F59E0B;
                     color: #000;
-                    font-weight: bold;
+                    font-weight: 400;
+                }
+            }
+        }
+    }
+}
+
+// SEARCH WIDGET (POPUP) CALENDAR
+.date-select-wrapper {
+    position: relative;
+
+    // The visible date display
+    .selected-date-display {
+        background: white;
+        padding: 12px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        min-width: 200px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+    }
+
+    // Popup container
+    .date-popup {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 100;
+        margin-top: 5px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        background: #111827;
+        min-width: 280px;
+
+        &.active {
+            display: block;
+        }
+
+        // Calendar inside popup
+        .calendar-wrapper {
+            font-size: 11px;
+            padding: 10px;
+
+            .year-nav {
+                padding: 0.75rem 0;
+
+                h2 {
+                    font-size: 1.5rem;
+                    margin: 0 1rem;
+                }
+
+                .prev-year,
+                .next-year {
+                    padding: 0.25rem;
+                    font-size: 1.5rem;
+                }
+            }
+
+            .calendar-instruction {
+                margin-bottom: 8px;
+                font-size: 0.9rem;
+            }
+
+            .calendar-month {
+                margin-bottom: 0;
+
+                .month-header {
+                    padding: 0.75rem;
+                    font-size: 13px;
+                }
+
+                .calendar-days div {
+                    padding: 0.5rem 0.25rem;
+                    font-size: 10px;
+                }
+
+                .calendar-dates div {
+                    margin: 0.25rem;
+                    height: 2rem;
+                    width: 2rem;
+                    font-size: 11px;
+                }
+            }
+        }
+    }
+}
+
+// BOOKING WIDGET CALENDAR
+.booking-form-container {
+    border-radius: 0.563rem;
+    margin-bottom: 2rem;
+    background-color: #111827;
+    font-size: 14px;
+
+    .year-nav {
+        padding: 1.5rem 0;
+
+        h2 {
+            margin: 0 2rem;
+            font-size: 2rem;
+        }
+
+        .prev-year,
+        .next-year {
+            padding: 0.5rem;
+            font-size: 2.25rem;
+        }
+    }
+
+    .calendar-instruction {
+        margin-bottom: 16px;
+        font-size: 1rem;
+    }
+
+    .calendar-month {
+        margin-bottom: 1.5rem;
+
+        .month-header {
+            padding: 1.2rem;
+            font-size: 16px;
+        }
+
+        .calendar-days div {
+            padding: 0.75rem 0.5rem;
+            font-size: 14px;
+        }
+
+        .calendar-dates div {
+            margin: 0.5rem !important;
+            height: 2.5rem;
+            width: 2.5rem;
+            font-size: 14px;
+        }
+    }
+}
+
+// RESPONSIVE ADJUSTMENTS
+@media (max-width: 768px) {
+
+    // Search widget responsive styles
+    .date-select-wrapper {
+        .date-popup {
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90vw;
+            max-width: 320px;
+        }
+    }
+
+    // Booking widget responsive styles
+    .everliz-booking-form .calendar-wrapper {
+        .year-nav {
+            padding: 1rem 0;
+
+            h2 {
+                font-size: 1.5rem;
+                margin: 0 1rem;
+            }
+
+            .prev-year,
+            .next-year {
+                font-size: 1.75rem;
+            }
+        }
+
+        .calendar-month {
+            .calendar-dates {
+                gap: 20px;
+                margin-bottom: 1rem;
+
+                div {
+                    margin: 0.25rem;
+                    height: 2rem;
+                    width: 2rem;
                 }
             }
         }

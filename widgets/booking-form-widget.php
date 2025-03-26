@@ -65,7 +65,6 @@ class Booking_Form_Widget extends \Elementor\Widget_Base
 <div class="booking-form-container">
     <!-- Calendar section with selected date -->
     <div class="calendar-section">
-        <p class="required-field">Choose a reservation date</p>
         <div class="calendar-wrapper" id="oktoberfest-calendar">
             <!-- Calendar will be rendered by JavaScript -->
         </div>

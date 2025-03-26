@@ -1,7 +1,6 @@
 .everliz-reservation-form {
     max-width: $container-md;
     margin: 0 auto;
-    padding: $spacing-xl;
     
     form {
       @include flex(row, center, flex-end, $spacing-md);

@@ -122,7 +122,7 @@ class Reservation_Form_Widget extends \Elementor\Widget_Base {
                     <?php echo esc_html($settings['date_placeholder']); ?></div>
                 <div class="date-popup" id="date-popup">
                     <div class="calendar-wrapper" id="search-calendar">
-                        <!-- Calendar will be rendered by JavaScript -->
+                        <!-- Calendar -->
                     </div>
                 </div>
             </div>
@@ -155,7 +155,7 @@ jQuery(document).ready(function($) {
             startDate: '<?php echo esc_js($start_date); ?>',
             endDate: '<?php echo esc_js($end_date); ?>',
             inputField: $('#booking_date'),
-            compact: true,
+            compact: false,
             popupElement: $('#date-popup')
         });
 
@@ -235,89 +235,6 @@ jQuery(document).ready(function($) {
 });
 </script>
 
-<style>
-.date-select-wrapper {
-    position: relative;
-}
-
-.selected-date-display {
-    background: white;
-    padding: 12px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    min-width: 200px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-}
-
-.date-popup {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 100;
-    margin-top: 5px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-    background: #111827;
-    width: 250px;
-    /* Set a fixed width */
-}
-
-.date-popup.active {
-    display: block;
-}
-
-/* Compact calendar styles */
-.calendar-wrapper {
-    font-size: 12px;
-    /* Smaller base font size */
-}
-
-.calendar-wrapper .year-nav {
-    padding: 8px 0;
-}
-
-.calendar-wrapper .year-nav h2 {
-    font-size: 18px;
-    margin: 0 10px;
-}
-
-.calendar-wrapper .month-header {
-    font-size: 14px;
-    padding: 5px;
-}
-
-.calendar-wrapper .calendar-days div {
-    padding: 3px;
-    font-size: 11px;
-}
-
-.calendar-wrapper .calendar-dates div {
-    width: 24px;
-    height: 24px;
-    margin: 2px;
-    font-size: 11px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.calendar-wrapper .calendar-month {
-    margin-bottom: 5px;
-}
-
-/* Make both months fit nicely in the popup */
-.calendar-wrapper .calendar-month:first-child {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 5px;
-}
-
-.calendar-wrapper .calendar-month:last-child {
-    padding-top: 5px;
-}
-</style>
 <?php
     }
 }

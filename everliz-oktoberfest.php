@@ -1,9 +1,11 @@
 <?php
 
 /**
- * Plugin Name: Oktoberfest VIP Booking System
- * Description: Custom Elementor widgets for Oktoberfest VIP booking system
- * Version: 1.0.0
+ * Plugin Name: Oktoberfest VIP Booking
+ * Description: Custom Elementor widgets for Oktoberfest VIP booking
+ * Version: 1.5
+ * Author: Edris Husein
+ * Author URI: edrishusein.com
  */
 if (!defined('ABSPATH')) exit;
 

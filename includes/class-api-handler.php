@@ -117,7 +117,7 @@ class API_Handler {
     }
     
     /**
-     * Make API request
+     * API request
      * 
      * @param string $method HTTP method (GET, POST, etc.)
      * @param string $endpoint API endpoint
@@ -153,7 +153,6 @@ class API_Handler {
         
         $response = wp_remote_request($url, $args);
         
-        // Check for errors
         if (is_wp_error($response)) {
             error_log('Oktoberfest VIP API Error: ' . $response->get_error_message());
             return [
@@ -190,7 +189,7 @@ class API_Handler {
     }
     
     /**
-     * Get dummy data for development/testing
+     * Dummy data for development
      * 
      * @param string $endpoint API endpoint
      * @param array $params Parameters

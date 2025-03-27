@@ -63,10 +63,9 @@ class Booking_Form_Widget extends \Elementor\Widget_Base
 
 ?>
 <div class="booking-form-container">
-    <!-- Calendar section with selected date -->
     <div class="calendar-section">
         <div class="calendar-wrapper" id="oktoberfest-calendar">
-            <!-- Calendar will be rendered by JavaScript -->
+            <!-- Calendar -->
         </div>
         <input type="hidden" name="selected_date" value="<?php echo esc_attr($date); ?>">
     </div>
@@ -79,7 +78,6 @@ class Booking_Form_Widget extends \Elementor\Widget_Base
                     $end_date = isset($options['oktoberfest_end_date']) ? $options['oktoberfest_end_date'] : '2025-10-05';
                     ?>
 
-        // Initialize calendar
         OktoberfestCalendar.init({
             container: $('#oktoberfest-calendar'),
             startDate: '<?php echo esc_js($start_date); ?>',

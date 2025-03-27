@@ -1,0 +1,39 @@
+/* Responsive Adjustments */
+@media screen and (max-width: 782px) {
+    .oktoberfest-settings {
+        .nav-tab {
+            padding: 10px 15px;
+            font-size: 14px;
+        }
+
+        .general-settings-container,
+        .date-ranges-container,
+        .api-settings-container {
+            padding: 20px;
+        }
+
+        #oktoberfest-dates {
+            th,
+            td {
+                padding: 10px;
+            }
+
+            input[type="number"],
+            input[type="date"] {
+                max-width: 100%;
+            }
+        }
+
+        .api-settings-container {
+            th {
+                padding: 15px 0 5px 0;
+                width: 100%;
+                display: block;
+            }
+
+            .regular-text {
+                max-width: 100%;
+            }
+        }
+    }
+} 

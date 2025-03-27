@@ -1,0 +1,12 @@
+// Import variables and mixins
+@import 'variables';
+@import 'mixins';
+
+// Admin-specific styles
+@import 'admin/settings';
+@import 'admin/tent-selection';
+@import 'admin/forms';
+@import 'admin/tabs';
+
+// Responsive styles
+@import 'admin/responsive'; 

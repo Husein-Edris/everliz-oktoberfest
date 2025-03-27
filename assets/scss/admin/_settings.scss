@@ -1,0 +1,91 @@
+/* Admin Settings Page Styles */
+.oktoberfest-settings {
+    max-width: 1200px;
+    margin: 20px 0;
+
+    .general-settings-container,
+    .date-ranges-container,
+    .api-settings-container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* General Settings */
+    .general-settings-container {
+        .page-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        select {
+            min-width: 300px;
+        }
+    }
+
+    /* Date Ranges */
+    .date-ranges-header {
+        margin-bottom: 30px;
+
+        h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: #1d2327;
+        }
+
+        .description {
+            color: #646970;
+            font-size: 14px;
+            margin: 0;
+        }
+    }
+
+    .date-ranges-table-container {
+        margin-bottom: 20px;
+        overflow-x: auto;
+    }
+
+    #oktoberfest-dates {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-bottom: 20px;
+
+        th {
+            background: #f0f0f1;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #1d2327;
+            border-bottom: 2px solid #c3c4c7;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #c3c4c7;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        input[type="number"],
+        input[type="date"] {
+            width: 100%;
+            max-width: 200px;
+            padding: 8px 12px;
+            border: 1px solid #8c8f94;
+            border-radius: 4px;
+            font-size: 14px;
+
+            &:focus {
+                border-color: #2271b1;
+                box-shadow: 0 0 0 1px #2271b1;
+                outline: none;
+            }
+        }
+    }
+} 

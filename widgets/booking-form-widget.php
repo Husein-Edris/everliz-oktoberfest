@@ -47,6 +47,11 @@ class Booking_Form_Widget extends \Elementor\Widget_Base
             // Try to decode base64, if it fails use as-is
             $decoded_date = base64_decode($encoded_date, true);
             $date = ($decoded_date !== false) ? $decoded_date : $encoded_date;
+
+            // Ensure date is in correct format (YYYY-MM-DD)
+            if (strtotime($date)) {
+                $date = date('Y-m-d', strtotime($date));
+            }
         }
 
         if (!empty($encoded_location)) {
@@ -71,39 +76,72 @@ class Booking_Form_Widget extends \Elementor\Widget_Base
             </div>
             <script>
                 jQuery(document).ready(function($) {
-                    // Get date ranges from WordPress options
-                    <?php
-                    $date_ranges = get_option('oktoberfest_date_ranges', [[
-                        'year' => '2025',
-                        'start_date' => '2025-09-20',
-                        'end_date' => '2025-10-05'
-                    ]]);
+                    // Initialize calendar if OktoberfestCalendar is available
+                    if (typeof OktoberfestCalendar !== 'undefined') {
+                        // Get date ranges from WordPress options with proper type checking
+                        <?php
+                        $date_ranges = get_option('oktoberfest_date_ranges');
+                        if (!is_array($date_ranges)) {
+                            $date_ranges = [[
+                                'year' => '2025',
+                                'start_date' => '2025-09-20',
+                                'end_date' => '2025-10-05'
+                            ]];
+                        }
 
-                    // Get default start and end dates from the first available range
-                    $first_range = reset($date_ranges);
-                    $start_date = $first_range ? $first_range['start_date'] : '2025-09-20';
-                    $end_date = $first_range ? $first_range['end_date'] : '2025-10-05';
-
-                    // Convert date ranges to format expected by calendar
-                    $calendar_date_ranges = [];
-                    foreach ($date_ranges as $range) {
-                        $calendar_date_ranges[$range['year']] = [
-                            'start' => $range['start_date'],
-                            'end' => $range['end_date']
+                        // Get default start and end dates from the first available range
+                        $first_range = is_array($date_ranges) && !empty($date_ranges) ? reset($date_ranges) : [
+                            'year' => '2025',
+                            'start_date' => '2025-09-20',
+                            'end_date' => '2025-10-05'
                         ];
-                    }
-                    ?>
 
-                    OktoberfestCalendar.init({
-                        container: $('#oktoberfest-calendar'),
-                        startDate: '<?php echo esc_js($start_date); ?>',
-                        endDate: '<?php echo esc_js($end_date); ?>',
-                        selectedDate: '<?php echo esc_js($date); ?>',
-                        dateRanges: <?php echo json_encode($calendar_date_ranges); ?>,
-                        minYear: 2025,
-                        maxYear: 2028,
-                        compact: false
-                    });
+                        $start_date = isset($first_range['start_date']) ? $first_range['start_date'] : '2025-09-20';
+                        $end_date = isset($first_range['end_date']) ? $first_range['end_date'] : '2025-10-05';
+
+                        // Convert date ranges to format expected by calendar
+                        $calendar_date_ranges = [];
+                        if (is_array($date_ranges)) {
+                            foreach ($date_ranges as $range) {
+                                if (isset($range['year'], $range['start_date'], $range['end_date'])) {
+                                    $calendar_date_ranges[$range['year']] = [
+                                        'start' => $range['start_date'],
+                                        'end' => $range['end_date']
+                                    ];
+                                }
+                            }
+                        }
+                        ?>
+
+                        // Initialize the calendar with admin-defined date ranges
+                        OktoberfestCalendar.init({
+                            container: $('#oktoberfest-calendar'),
+                            startDate: '<?php echo esc_js($start_date); ?>',
+                            endDate: '<?php echo esc_js($end_date); ?>',
+                            selectedDate: '<?php echo esc_js($date); ?>',
+                            dateRanges: <?php echo json_encode($calendar_date_ranges); ?>,
+                            minYear: 2025,
+                            maxYear: 2028,
+                            compact: false,
+                            onDateSelect: function(selectedDate) {
+                                // Update hidden input
+                                $('input[name="selected_date"]').val(selectedDate);
+
+                                // Update display if needed
+                                if (selectedDate) {
+                                    const dateObj = new Date(selectedDate);
+                                    const options = {
+                                        weekday: 'long',
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric'
+                                    };
+                                    const formattedDate = dateObj.toLocaleDateString('en-US', options);
+                                    // Update any date display elements if needed
+                                }
+                            }
+                        });
+                    }
                 });
             </script>
 
@@ -137,9 +175,8 @@ class Booking_Form_Widget extends \Elementor\Widget_Base
                 <!-- Tent Selection -->
                 <div class="tent-selection">
                     <p class="section-title">Tent talk</p>
-
                     <div class="tent-preference">
-                        <div class="preference-option">
+                        <div class="preference-option<?php echo ($tent_preference === 'any') ? ' selected' : ''; ?>">
                             <input type="radio" id="any-tent" name="tent_preference" value="any"
                                 <?php checked($tent_preference, 'any'); ?>>
                             <label for="any-tent">Any big tent</label>
@@ -147,7 +184,7 @@ class Booking_Form_Widget extends \Elementor\Widget_Base
                                 tents will do, as long as there's cold beer, good food, and a lively Oktoberfest atmosphere!</p>
                         </div>
 
-                        <div class="preference-option">
+                        <div class="preference-option<?php echo ($tent_preference === 'specific') ? ' selected' : ''; ?>">
                             <input type="radio" id="specific-tent" name="tent_preference" value="specific"
                                 <?php checked($tent_preference, 'specific'); ?>>
                             <label for="specific-tent">Specific tent preference</label>

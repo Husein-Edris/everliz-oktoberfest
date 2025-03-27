@@ -104,4 +104,62 @@ jQuery(document).ready(function($) {
             'max': `${year}-12-31`
         });
     });
+
+    // Handle tent preference selection
+    $('.booking-form-container .preference-option').on('click', function(e) {
+        e.preventDefault();
+        const radio = $(this).find('input[type="radio"]');
+        
+        // Remove selected class from all options
+        $('.booking-form-container .preference-option').removeClass('selected');
+        // Add selected class to clicked option
+        $(this).addClass('selected');
+        
+        // Check the radio button
+        radio.prop('checked', true);
+        
+        // Show/hide tent gallery based on selection
+        const tentGallery = $('.booking-form-container .tent-gallery');
+        if (radio.val() === 'specific') {
+            tentGallery.slideDown(300);
+        } else {
+            tentGallery.slideUp(300);
+            // Clear tent selection when switching to "Any tent"
+            $('.booking-form-container .tent-card').removeClass('selected');
+            $('#selected-tent').val('');
+        }
+    });
+
+    // Handle tent card selection
+    $('.booking-form-container .tent-card').on('click', function(e) {
+        e.preventDefault();
+        const tentId = $(this).data('tent-id');
+        
+        // Update hidden input
+        $('#selected-tent').val(tentId);
+        
+        // Update visual selection
+        $('.booking-form-container .tent-card').removeClass('selected');
+        $(this).addClass('selected');
+        
+        // Ensure "Specific tent preference" is selected
+        const specificOption = $('#specific-tent').closest('.preference-option');
+        if (!specificOption.hasClass('selected')) {
+            specificOption.trigger('click');
+        }
+    });
+
+    // Initialize state based on selected tent
+    const selectedTent = $('#selected-tent').val();
+    if (selectedTent) {
+        const tentCard = $(`.booking-form-container .tent-card[data-tent-id="${selectedTent}"]`);
+        if (tentCard.length) {
+            tentCard.addClass('selected');
+            $('#specific-tent').closest('.preference-option').addClass('selected');
+            $('.booking-form-container .tent-gallery').show();
+        }
+    } else {
+        $('#any-tent').closest('.preference-option').addClass('selected');
+        $('.booking-form-container .tent-gallery').hide();
+    }
 }); 

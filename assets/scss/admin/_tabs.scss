@@ -1,0 +1,30 @@
+/* Tab Styles */
+.oktoberfest-settings {
+    .nav-tab-wrapper {
+        margin-bottom: 30px;
+        border-bottom: 2px solid #2271b1;
+        padding-bottom: 0;
+    }
+
+    .nav-tab {
+        font-size: 15px;
+        padding: 12px 24px;
+        margin-bottom: -2px;
+        font-weight: 500;
+        border: none;
+        background: transparent;
+        color: #1d2327;
+        transition: all 0.2s ease;
+
+        &:hover {
+            color: #2271b1;
+            background: rgba(34, 113, 177, 0.05);
+        }
+
+        &.nav-tab-active {
+            color: #2271b1;
+            border-bottom: 2px solid #2271b1;
+            background: rgba(34, 113, 177, 0.05);
+        }
+    }
+} 

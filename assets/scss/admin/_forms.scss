@@ -1,0 +1,41 @@
+/* Form Styles */
+.oktoberfest-form {
+    .form-table {
+        margin-top: 0;
+    }
+
+    th {
+        padding: 20px 10px 20px 0;
+        width: 200px;
+        color: #1d2327;
+        font-weight: 600;
+    }
+
+    .regular-text {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .description {
+        margin-top: 8px;
+        color: #646970;
+        font-size: 13px;
+    }
+
+    /* Submit Button */
+    .submit {
+        margin-top: 30px;
+        padding: 20px 30px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+        .button-primary {
+            padding: 6px 20px;
+            height: auto;
+            line-height: 2 !important;
+            font-size: 14px;
+            min-width: 150px;
+        }
+    }
+} 

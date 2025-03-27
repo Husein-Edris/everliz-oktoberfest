@@ -1,0 +1,13 @@
+{
+  "name": "everliz-oktoberfest",
+  "version": "1.0.0",
+  "description": "Oktoberfest VIP Booking WordPress Plugin",
+  "scripts": {
+    "sass": "sass assets/scss:assets/css --style=compressed --watch",
+    "build": "sass assets/scss:assets/css --style=compressed",
+    "postinstall": "npm run build"
+  },
+  "devDependencies": {
+    "sass": "^1.69.5"
+  }
+} 

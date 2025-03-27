@@ -37,7 +37,8 @@ class Oktoberfest_VIP_Booking
 
     public function admin_enqueue_scripts($hook)
     {
-        if ('oktoberfest_page_oktoberfest-settings' !== $hook) {
+        // Enqueue on all admin pages that start with oktoberfest
+        if (strpos($hook, 'oktoberfest') === false) {
             return;
         }
 
@@ -74,7 +75,7 @@ class Oktoberfest_VIP_Booking
     public function enqueue_assets()
     {
         wp_enqueue_style(
-            'oktoberfest-vip-styles',
+            'oktoberfest-styles',
             $this->plugin_url . 'assets/css/main.css',
             [],
             filemtime($this->plugin_path . 'assets/css/main.css')
@@ -272,8 +273,10 @@ class Oktoberfest_VIP_Booking
                         <div class="page-actions">
                             <a href="<?php echo admin_url('post-new.php?post_type=page'); ?>" class="button">Create New Page</a>
                             <?php if (!empty($general_settings['booking_page'])) : ?>
-                                <a href="<?php echo get_edit_post_link($general_settings['booking_page']); ?>" class="button">Edit Page</a>
-                                <a href="<?php echo get_permalink($general_settings['booking_page']); ?>" class="button" target="_blank">View Page</a>
+                                <a href="<?php echo get_edit_post_link($general_settings['booking_page']); ?>" class="button">Edit
+                                    Page</a>
+                                <a href="<?php echo get_permalink($general_settings['booking_page']); ?>" class="button"
+                                    target="_blank">View Page</a>
                             <?php endif; ?>
                         </div>
                     </td>
@@ -311,24 +314,16 @@ class Oktoberfest_VIP_Booking
                         <?php foreach ($date_ranges as $index => $range) : ?>
                             <tr class="date-range-row">
                                 <td>
-                                    <input type="number"
-                                        name="oktoberfest_date_ranges[<?php echo $index; ?>][year]"
-                                        value="<?php echo esc_attr($range['year']); ?>"
-                                        min="2025"
-                                        max="2028"
-                                        required>
+                                    <input type="number" name="oktoberfest_date_ranges[<?php echo $index; ?>][year]"
+                                        value="<?php echo esc_attr($range['year']); ?>" min="2025" max="2028" required>
                                 </td>
                                 <td>
-                                    <input type="date"
-                                        name="oktoberfest_date_ranges[<?php echo $index; ?>][start_date]"
-                                        value="<?php echo esc_attr($range['start_date']); ?>"
-                                        required>
+                                    <input type="date" name="oktoberfest_date_ranges[<?php echo $index; ?>][start_date]"
+                                        value="<?php echo esc_attr($range['start_date']); ?>" required>
                                 </td>
                                 <td>
-                                    <input type="date"
-                                        name="oktoberfest_date_ranges[<?php echo $index; ?>][end_date]"
-                                        value="<?php echo esc_attr($range['end_date']); ?>"
-                                        required>
+                                    <input type="date" name="oktoberfest_date_ranges[<?php echo $index; ?>][end_date]"
+                                        value="<?php echo esc_attr($range['end_date']); ?>" required>
                                 </td>
                                 <td>
                                     <button type="button" class="button remove-date-range">
@@ -363,11 +358,8 @@ class Oktoberfest_VIP_Booking
                         <label for="api_key">API Key</label>
                     </th>
                     <td>
-                        <input type="text"
-                            id="api_key"
-                            name="oktoberfest_api_settings[api_key]"
-                            value="<?php echo esc_attr($api_settings['api_key'] ?? ''); ?>"
-                            class="regular-text">
+                        <input type="text" id="api_key" name="oktoberfest_api_settings[api_key]"
+                            value="<?php echo esc_attr($api_settings['api_key'] ?? ''); ?>" class="regular-text">
                         <p class="description">Enter your API key for authentication.</p>
                     </td>
                 </tr>
@@ -376,11 +368,8 @@ class Oktoberfest_VIP_Booking
                         <label for="api_secret">API Secret</label>
                     </th>
                     <td>
-                        <input type="password"
-                            id="api_secret"
-                            name="oktoberfest_api_settings[api_secret]"
-                            value="<?php echo esc_attr($api_settings['api_secret'] ?? ''); ?>"
-                            class="regular-text">
+                        <input type="password" id="api_secret" name="oktoberfest_api_settings[api_secret]"
+                            value="<?php echo esc_attr($api_settings['api_secret'] ?? ''); ?>" class="regular-text">
                         <p class="description">Enter your API secret key.</p>
                     </td>
                 </tr>
@@ -389,11 +378,8 @@ class Oktoberfest_VIP_Booking
                         <label for="api_endpoint">API Endpoint</label>
                     </th>
                     <td>
-                        <input type="url"
-                            id="api_endpoint"
-                            name="oktoberfest_api_settings[api_endpoint]"
-                            value="<?php echo esc_url($api_settings['api_endpoint'] ?? ''); ?>"
-                            class="regular-text">
+                        <input type="url" id="api_endpoint" name="oktoberfest_api_settings[api_endpoint]"
+                            value="<?php echo esc_url($api_settings['api_endpoint'] ?? ''); ?>" class="regular-text">
                         <p class="description">Enter the API endpoint URL.</p>
                     </td>
                 </tr>

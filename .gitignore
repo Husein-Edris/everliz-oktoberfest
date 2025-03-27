@@ -1,2 +1,4 @@
-assets/css/*
+assets/css/*.css
+assets/css/*.css.map
+node_modules/
 *.log

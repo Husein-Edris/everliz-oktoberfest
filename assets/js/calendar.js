@@ -42,14 +42,9 @@
             // Validate current year is within allowed range
             if (this.currentYear < this.minYear) this.currentYear = this.minYear;
             if (this.currentYear > this.maxYear) this.currentYear = this.maxYear;
-            
-            // Store known Oktoberfest date ranges (configurable)
-            this.oktoberfestDates = options.dateRanges || {
-                2025: { start: '2025-09-20', end: '2025-10-05' },
-                2026: { start: '2026-09-19', end: '2026-10-04' },
-                2027: { start: '2027-09-18', end: '2027-10-03' },
-                2028: { start: '2028-09-16', end: '2028-10-03' }
-            };
+
+            // Store date ranges from admin settings
+            this.oktoberfestDates = options.dateRanges || {};
             
             this.renderCalendar();
             this.bindEvents();
@@ -270,7 +265,8 @@
             const self = this;
             
             // Year navigation
-            this.calendarEl.on('click', '.prev-year, .next-year', function (e) {
+            this.calendarEl.on('click', '.prev-year:not(.disabled), .next-year:not(.disabled)', function (e) {
+                e.preventDefault();
                 e.stopPropagation();
                 
                 let newYear = self.currentYear;
@@ -284,9 +280,14 @@
                 if (newYear >= self.minYear && newYear <= self.maxYear) {
                     self.currentYear = newYear;
                     self.renderCalendar();
+                    
+                    // Keep popup open after rendering
+                    if (self.popupElement) {
+                        self.popupElement.addClass('active');
+                    }
                 }
                 
-                return false; // Prevent event bubbling
+                return false;
             });
             
             // Date selection

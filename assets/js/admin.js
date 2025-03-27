@@ -1,0 +1,107 @@
+jQuery(document).ready(function($) {
+    // Add new date range row
+    $('#add-date-range').on('click', function() {
+        const index = $('.date-range-row').length;
+        const newRow = `
+            <tr class="date-range-row">
+                <td>
+                    <input type="number" 
+                           name="oktoberfest_date_ranges[${index}][year]"
+                           min="2025" 
+                           max="2028" 
+                           required>
+                </td>
+                <td>
+                    <input type="date" 
+                           name="oktoberfest_date_ranges[${index}][start_date]" 
+                           required>
+                </td>
+                <td>
+                    <input type="date" 
+                           name="oktoberfest_date_ranges[${index}][end_date]" 
+                           required>
+                </td>
+                <td>
+                    <button type="button" class="button remove-date-range">Remove</button>
+                </td>
+            </tr>
+        `;
+        $('#oktoberfest-dates tbody').append(newRow);
+    });
+
+    // Remove date range row
+    $(document).on('click', '.remove-date-range', function() {
+        const $row = $(this).closest('tr');
+        
+        // Don't remove if it's the last row
+        if ($('.date-range-row').length > 1) {
+            $row.fadeOut(300, function() {
+                $(this).remove();
+            });
+        } else {
+            alert('You must keep at least one date range.');
+        }
+    });
+
+    // Validate date ranges
+    function validateDateRange($row) {
+        const year = $row.find('input[type="number"]').val();
+        const startDate = $row.find('input[name*="[start_date]"]').val();
+        const endDate = $row.find('input[name*="[end_date]"]').val();
+        
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            
+            if (start > end) {
+                alert('End date must be after start date.');
+                return false;
+            }
+            
+            if (start.getFullYear() != year || end.getFullYear() != year) {
+                alert('Dates must be within the selected year.');
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    // Validate on form submit
+    $('.oktoberfest-form').on('submit', function(e) {
+        let isValid = true;
+        
+        $('.date-range-row').each(function() {
+            if (!validateDateRange($(this))) {
+                isValid = false;
+                return false; // Break the loop
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+
+    // Update date input min/max when year changes
+    $(document).on('change', '.date-range-row input[type="number"]', function() {
+        const $row = $(this).closest('tr');
+        const year = $(this).val();
+        
+        $row.find('input[type="date"]').each(function() {
+            $(this).attr({
+                'min': `${year}-01-01`,
+                'max': `${year}-12-31`
+            });
+        });
+    });
+
+    // Initialize date input constraints
+    $('.date-range-row').each(function() {
+        const year = $(this).find('input[type="number"]').val();
+        $(this).find('input[type="date"]').attr({
+            'min': `${year}-01-01`,
+            'max': `${year}-12-31`
+        });
+    });
+}); 

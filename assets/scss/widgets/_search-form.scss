@@ -1,0 +1,260 @@
+.everliz-search-form {
+    max-width: $container-lg;
+    margin: 0 auto;
+    padding: 0;
+    
+    form {
+        @include flex(row, center, flex-end, $spacing-md);
+        background: transparent;
+        
+        @include mobile {
+            @include flex(column, center, stretch, $spacing-md);
+        }
+    }
+    
+    .form-group {
+        margin: 0;
+        @include flex(column, flex-start, flex-start, $spacing-xs);
+        flex: 1;
+        min-width: 280px;
+        
+        @include mobile {
+            width: 100%;
+        }
+
+        label {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 400;
+            margin-bottom: $spacing-md;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        &.date-picker-container {
+            position: relative;
+
+            .date-select-wrapper {
+                position: relative;
+                width: 100%;
+            }
+
+            .selected-date-display {
+                background: white;
+                border: none;
+                border-radius: $border-radius-lg;
+                padding: 1rem 1.5rem;
+                width: 100%;
+                min-height: 60px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                color: #666;
+                font-size: $font-size-lg;
+                transition: all 0.2s ease;
+                
+                &::before {
+                    content: '';
+                    display: inline-block;
+                    width: 24px;
+                    height: 24px;
+                    margin-right: 12px;
+                    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F3A735'%3E%3Cpath d='M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z'/%3E%3C/svg%3E");
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                }
+            }
+
+            .date-popup {
+                display: none;
+                position: absolute;
+                top: calc(100% + 8px);
+                left: 0;
+                background: $dark-bg;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: $border-radius-lg;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+                z-index: 1000;
+                padding: 1.5rem;
+                min-width: 320px;
+                
+                @include mobile {
+                    width: 100%;
+                    min-width: unset;
+                }
+                
+                &.active {
+                    display: block;
+                }
+
+                .calendar-wrapper {
+                    width: 100%;
+
+                    .calendar-header {
+                        text-align: center;
+                        margin-bottom: $spacing-md;
+                        color: rgba(255, 255, 255, 0.7);
+                        font-size: $font-size-sm;
+                    }
+
+                    .month-header {
+                        color: white;
+                        font-size: $font-size-lg;
+                        font-weight: 500;
+                        text-align: center;
+                        margin: $spacing-md 0;
+                        padding: $spacing-sm;
+                        background: rgba(255, 255, 255, 0.05);
+                        border-radius: $border-radius;
+                    }
+                }
+            }
+        }
+
+        select {
+            background: white;
+            border: none;
+            border-radius: $border-radius-lg;
+            padding: 1rem 1.5rem;
+            width: 100%;
+            min-height: 60px;
+            appearance: none;
+            color: #666;
+            font-size: $font-size-lg;
+            padding-right: 3rem;
+            transition: all 0.2s ease;
+            
+            &::before {
+                content: '';
+                display: inline-block;
+                width: 24px;
+                height: 24px;
+                margin-right: 12px;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23F3A735'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z'/%3E%3C/svg%3E");
+                background-size: contain;
+                background-repeat: no-repeat;
+            }
+        }
+    }
+    
+    .search-submit {
+        @include button($primary-color, white, $primary-hover);
+        height: 60px;
+        min-width: 160px;
+        text-transform: none;
+        font-size: 1.5rem;
+        font-weight: 500;
+        letter-spacing: 0;
+        padding: 0 2rem;
+        border-radius: $border-radius-lg;
+        margin-top: 3rem;
+        
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        &:active {
+            transform: translateY(0);
+        }
+        
+        @include mobile {
+            width: 100%;
+            margin-top: $spacing-lg;
+        }
+    }
+    
+    /* Calendar Styles */
+    .calendar-dates {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+        margin-top: $spacing-md;
+
+        div {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: $font-size-base;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            color: rgba(255, 255, 255, 0.7);
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+
+            &:hover:not(.disabled):not(.empty) {
+                background: rgba($primary-color, 0.2);
+                color: white;
+            }
+
+            &.selected {
+                background-color: $primary-color;
+                color: white;
+            }
+
+            &.disabled {
+                color: rgba(255, 255, 255, 0.2);
+                cursor: not-allowed;
+                background: transparent;
+            }
+            
+            &.empty {
+                pointer-events: none;
+                background: transparent;
+            }
+        }
+    }
+
+    .year-nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: $spacing-md;
+        gap: $spacing-xl;
+
+        h2 {
+            margin: 0;
+            font-size: 1.75rem;
+            font-weight: 400;
+            color: $primary-color;
+        }
+
+        span {
+            cursor: pointer;
+            color: $primary-color;
+            font-size: 1.5rem;
+            transition: all 0.2s ease;
+
+            &:hover:not(.disabled) {
+                color: lighten($primary-color, 10%);
+            }
+
+            &.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                color: rgba(255, 255, 255, 0.2);
+            }
+        }
+    }
+
+    .calendar-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+        margin-bottom: $spacing-sm;
+
+        div {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: $font-size-sm;
+            color: rgba(255, 255, 255, 0.5);
+            width: 40px;
+            height: 40px;
+        }
+    }
+}

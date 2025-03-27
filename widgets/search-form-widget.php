@@ -1,26 +1,33 @@
 <?php
+
 namespace Everliz_Oktoberfest;
 
 if (!defined('ABSPATH')) exit;
 
-class Reservation_Form_Widget extends \Elementor\Widget_Base {
-    public function get_name() {
-        return 'everliz_oktoberfest_reservation';
+class Search_Form_Widget extends \Elementor\Widget_Base
+{
+    public function get_name()
+    {
+        return 'everliz_oktoberfest_search';
     }
 
-    public function get_title() {
-        return __('Oktoberfest VIP Reservation', 'everliz-oktoberfest');
+    public function get_title()
+    {
+        return __('Oktoberfest VIP Search', 'everliz-oktoberfest');
     }
 
-    public function get_icon() {
-        return 'eicon-form-horizontal';
+    public function get_icon()
+    {
+        return 'eicon-search';
     }
 
-    public function get_categories() {
+    public function get_categories()
+    {
         return ['basic'];
     }
 
-    protected function register_controls() {
+    protected function register_controls()
+    {
         $this->start_controls_section(
             'content_section',
             [
@@ -28,7 +35,7 @@ class Reservation_Form_Widget extends \Elementor\Widget_Base {
                 'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
             ]
         );
-        
+
         $this->add_control(
             'date_placeholder',
             [
@@ -37,7 +44,7 @@ class Reservation_Form_Widget extends \Elementor\Widget_Base {
                 'default' => __('Select Date', 'everliz-oktoberfest'),
             ]
         );
-        
+
         $this->add_control(
             'location_placeholder',
             [
@@ -46,52 +53,16 @@ class Reservation_Form_Widget extends \Elementor\Widget_Base {
                 'default' => __('TENTS', 'everliz-oktoberfest'),
             ]
         );
-        
+
         $this->add_control(
             'button_text',
             [
                 'label' => __('Button Text', 'everliz-oktoberfest'),
                 'type' => \Elementor\Controls_Manager::TEXT,
-                'default' => __('Request', 'everliz-oktoberfest'),
+                'default' => __('Search', 'everliz-oktoberfest'),
             ]
         );
-        
-        // Add date range controls
-        $this->add_control(
-            'date_range_heading',
-            [
-                'label' => __('Oktoberfest Date Range', 'everliz-oktoberfest'),
-                'type' => \Elementor\Controls_Manager::HEADING,
-                'separator' => 'before',
-            ]
-        );
-        
-        $this->add_control(
-            'start_date',
-            [
-                'label' => __('Start Date', 'everliz-oktoberfest'),
-                'type' => \Elementor\Controls_Manager::DATE_TIME,
-                'default' => '2025-09-20',
-                'picker_options' => [
-                    'enableTime' => false,
-                    'dateFormat' => 'Y-m-d',
-                ],
-            ]
-        );
-        
-        $this->add_control(
-            'end_date',
-            [
-                'label' => __('End Date', 'everliz-oktoberfest'),
-                'type' => \Elementor\Controls_Manager::DATE_TIME,
-                'default' => '2025-10-05',
-                'picker_options' => [
-                    'enableTime' => false,
-                    'dateFormat' => 'Y-m-d',
-                ],
-            ]
-        );
-        
+
         $this->add_control(
             'booking_page',
             [
@@ -101,20 +72,41 @@ class Reservation_Form_Widget extends \Elementor\Widget_Base {
                 'description' => __('URL of the page with the booking form', 'everliz-oktoberfest'),
             ]
         );
-        
+
         $this->end_controls_section();
     }
-    protected function render() {
+
+    protected function render()
+    {
         $settings = $this->get_settings_for_display();
         $booking_page_url = !empty($settings['booking_page']) ? $settings['booking_page'] : home_url('/booking-page/');
-        
-        // Get date range from widget settings
-        $start_date = isset($settings['start_date']) ? $settings['start_date'] : '2025-09-20';
-        $end_date = isset($settings['end_date']) ? $settings['end_date'] : '2025-10-05';
-        ?>
 
-<div class="everliz-reservation-form">
-    <form id="reservation-form" method="GET" action="<?php echo esc_url($booking_page_url); ?>">
+        // Get date ranges from WordPress options
+        $date_ranges = get_option('oktoberfest_date_ranges', [
+            [
+                'year' => '2025',
+                'start_date' => '2025-09-20',
+                'end_date' => '2025-10-05'
+            ]
+        ]);
+
+        // Get default start and end dates from the first available range
+        $first_range = reset($date_ranges);
+        $start_date = $first_range ? $first_range['start_date'] : '2025-09-20';
+        $end_date = $first_range ? $first_range['end_date'] : '2025-10-05';
+
+        // Convert date ranges to format expected by calendar
+        $calendar_date_ranges = [];
+        foreach ($date_ranges as $range) {
+            $calendar_date_ranges[$range['year']] = [
+                'start' => $range['start_date'],
+                'end' => $range['end_date']
+            ];
+        }
+?>
+
+<div class="everliz-search-form">
+    <form id="search-form" method="GET" action="<?php echo esc_url($booking_page_url); ?>">
         <div class="form-group date-picker-container">
             <label><?php echo esc_html($settings['date_placeholder']); ?></label>
             <div class="date-select-wrapper">
@@ -140,7 +132,7 @@ class Reservation_Form_Widget extends \Elementor\Widget_Base {
             </select>
         </div>
 
-        <button type="submit" class="reservation-submit">
+        <button type="submit" class="search-submit">
             <?php echo esc_html($settings['button_text']); ?>
         </button>
     </form>
@@ -149,14 +141,17 @@ class Reservation_Form_Widget extends \Elementor\Widget_Base {
 jQuery(document).ready(function($) {
     // Initialize calendar if OktoberfestCalendar is available
     if (typeof OktoberfestCalendar !== 'undefined') {
-        // Initialize the calendar
+        // Initialize the calendar with admin-defined date ranges
         OktoberfestCalendar.init({
             container: $('#search-calendar'),
             startDate: '<?php echo esc_js($start_date); ?>',
             endDate: '<?php echo esc_js($end_date); ?>',
             inputField: $('#booking_date'),
             compact: false,
-            popupElement: $('#date-popup')
+            popupElement: $('#date-popup'),
+            dateRanges: <?php echo json_encode($calendar_date_ranges); ?>,
+            minYear: 2025,
+            maxYear: 2028
         });
 
         // Toggle date popup
@@ -174,13 +169,6 @@ jQuery(document).ready(function($) {
         // Close popup when clicking outside
         $(document).on('click', function() {
             $('#date-popup').removeClass('active');
-        });
-
-        // Prevent year navigation from closing popup
-        $(document).on('click', '.year-nav .prev-year, .year-nav .next-year', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
         });
 
         // Update selected date display when date changes
@@ -202,7 +190,7 @@ jQuery(document).ready(function($) {
     }
 
     // Form submission
-    $('#reservation-form').on('submit', function(e) {
+    $('#search-form').on('submit', function(e) {
         e.preventDefault();
 
         // Validate form
@@ -234,7 +222,6 @@ jQuery(document).ready(function($) {
     });
 });
 </script>
-
 <?php
     }
 }

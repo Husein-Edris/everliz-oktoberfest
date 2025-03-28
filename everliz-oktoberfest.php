@@ -288,20 +288,26 @@ class Oktoberfest_VIP_Booking
 
     private function render_date_ranges_tab()
     {
-        $date_ranges = get_option('oktoberfest_date_ranges', [[
-            'year' => '2025',
-            'start_date' => '2025-09-20',
-            'end_date' => '2025-10-05'
-        ]]);
+        // Get date ranges with proper type checking
+        $date_ranges = get_option('oktoberfest_date_ranges');
+
+        // Ensure $date_ranges is an array
+        if (!is_array($date_ranges)) {
+            $date_ranges = [[
+                'year' => '2025',
+                'start_date' => '2025-09-20',
+                'end_date' => '2025-10-05'
+            ]];
+        }
     ?>
         <div class="date-ranges-container">
             <div class="date-ranges-header">
-                <h3>Oktoberfest Date Ranges</h3>
-                <p class="description">Configure the dates when Oktoberfest will be held each year.</p>
+                <h3>Event Date Ranges</h3>
+                <p class="description">Set the date ranges for each year's Oktoberfest event.</p>
             </div>
 
             <div class="date-ranges-table-container">
-                <table class="form-table" id="oktoberfest-dates">
+                <table id="oktoberfest-dates">
                     <thead>
                         <tr>
                             <th>Year</th>

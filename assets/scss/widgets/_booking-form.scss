@@ -124,41 +124,109 @@
 
     .tent-preference {
         margin-bottom: $spacing-lg;
-    }
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-md;
 
-    .preference-option {
-        margin-bottom: $spacing-md;
-        background-color: $dark-bg-lighter;
-        border-radius: $border-radius-lg;
-        padding: $spacing-md;
-
-        input[type="radio"] {
-            margin-right: $spacing-sm;
+        @include mobile {
+            flex-direction: column;
+            gap: $spacing-sm;
         }
     }
 
-    .preference-description {
-        margin-top: $spacing-sm;
-        margin-left: $spacing-lg;
-        color: $text-muted;
+    .preference-option {
+        background-color: $dark-bg-lighter;
+        border-radius: 10px;
+        border: 2px solid transparent;
+        box-shadow: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        min-width: 250px;
+        max-width: 100%;
+        padding: $spacing-lg $spacing-xl;
+        margin-bottom: 0;
+        position: relative;
+
+        &.selected {
+            border-color: $highlight-color;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .radio-col {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            margin-right: $spacing-lg;
+            height: 100%;
+
+            input[type="radio"] {
+                appearance: none;
+                width: 25px;
+                height: 25px;
+                border: 1px solid #757c8a;
+                border-radius: 50%;
+                background: transparent;
+                position: relative;
+                outline: none;
+                transition: border-color 0.2s, box-shadow 0.2s;
+                margin: 0;
+                cursor: pointer;
+            }
+
+            input[type="radio"]:checked {
+                border: 2px solid $highlight-color;
+                box-shadow: 0 0 0 2px rgba($highlight-color, 0.2);
+                background: radial-gradient(circle at 50% 50%, $highlight-color 60%, transparent 61%);
+            }
+        }
+
+        .content-col {
+            flex: 1 1 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25em;
+
+            .option-title {
+                font-size: $font-size-lg;
+                font-weight: 600;
+                color: $text-color;
+                margin-bottom: 0.25em;
+            }
+
+            .preference-description {
+                margin: 0;
+                color: $text-muted;
+                font-size: $font-size-base;
+                opacity: 0.6;
+            }
+        }
     }
 
     .tent-gallery {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: $spacing-md;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: $spacing-xl;
         margin-bottom: $spacing-xl;
     }
 
     .tent-card {
         cursor: pointer;
-        border-radius: $border-radius-lg;
+        border-radius: 10px;
         overflow: hidden;
         position: relative;
-        height: 100px;
+        height: 200px;
+        border: 2px solid transparent;
+        box-shadow: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background: #222b38;
+        display: flex;
+        align-items: stretch;
 
         &.selected {
-            border: 2px solid $highlight-color;
+            border-color: $highlight-color;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
         }
     }
 
@@ -168,16 +236,34 @@
         background-size: cover;
         background-position: center;
         position: relative;
+        display: flex;
+        align-items: flex-end;
+
+        &::after {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 60px;
+            background: linear-gradient(180deg, rgba(34, 34, 34, 0) 0%, rgba(34, 34, 34, 0.8) 100%);
+            pointer-events: none;
+        }
     }
 
     .tent-name {
         position: absolute;
-        bottom: 0;
         left: 0;
         right: 0;
-        background-color: rgba(0, 0, 0, 0.7);
-        padding: $spacing-sm;
-        font-size: $font-size-sm;
+        bottom: 0;
+        padding: $spacing-md;
+        font-size: $font-size-base;
+        color: #fff;
+        z-index: 2;
+        background: none;
+        font-weight: 500;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     }
 
     .contact-section h3 {
@@ -195,5 +281,20 @@
         display: inline-flex;
         align-items: center;
         gap: $spacing-sm;
+    }
+}
+
+@media (max-width: 900px) {
+    .tent-gallery {
+        grid-template-columns: 1fr;
+    }
+
+    .preference-option {
+        flex-direction: column;
+        padding: $spacing-md;
+    }
+
+    .tent-card {
+        height: 160px;
     }
 }

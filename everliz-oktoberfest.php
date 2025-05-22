@@ -88,6 +88,14 @@ class Oktoberfest_VIP_Booking
             filemtime($this->plugin_path . 'assets/js/calendar.js'),
             true
         );
+
+        wp_enqueue_script(
+            'oktoberfest-main',
+            $this->plugin_url . 'assets/js/main.js',
+            ['jquery'],
+            filemtime($this->plugin_path . 'assets/js/main.js'),
+            true
+        );
     }
 
     public function register_widgets($widgets_manager)

@@ -132,8 +132,32 @@
         bindEvents: function() {
             this.form.on('submit', this.handleSubmit.bind(this));
             
+            // Make the entire .preference-option clickable
+            $('.preference-option').on('click', (e) => {
+                // Prevent double firing if the radio is clicked directly
+                if (!$(e.target).is('input[type="radio"]')) {
+                    $(e.currentTarget).find('input[type="radio"]').prop('checked', true).trigger('change');
+                }
+            });
+
             // Tent preference selection
-            this.tentPreferenceRadios.on('change', this.handleTentPreferenceChange.bind(this));
+            this.tentPreferenceRadios.on('change', (e) => {
+                // Remove selected from all
+                $('.tent-preference .preference-option').removeClass('selected');
+                $('.tent-preference .radio-col').removeClass('selected');
+                // Add selected to the checked one
+                $(e.target).closest('.preference-option').addClass('selected');
+                $(e.target).closest('.radio-col').addClass('selected');
+                // Show/hide tent gallery
+                this.handleTentPreferenceChange();
+            });
+            // On page load, set selected class for checked radio
+            this.tentPreferenceRadios.each(function() {
+                if ($(this).is(':checked')) {
+                    $(this).closest('.preference-option').addClass('selected');
+                    $(this).closest('.radio-col').addClass('selected');
+                }
+            });
             
             // Tent card selection
             this.tentCards.on('click', this.handleTentCardClick.bind(this));

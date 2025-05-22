@@ -16,17 +16,17 @@ class API_Handler
      * @var API_Handler Singleton instance
      */
     private static $instance = null;
-    
+
     /**
      * @var string API base URL
      */
     private $api_base_url;
-    
+
     /**
      * @var string API key
      */
     private $api_key;
-    
+
     /**
      * Get singleton instance
      * 
@@ -39,7 +39,7 @@ class API_Handler
         }
         return self::$instance;
     }
-    
+
     /**
      * Constructor
      */
@@ -49,7 +49,7 @@ class API_Handler
         $this->api_base_url = isset($options['api_url']) ? rtrim($options['api_url'], '/') : '';
         $this->api_key = isset($options['api_key']) ? $options['api_key'] : '';
     }
-    
+
     /**
      * Check if API is configured
      * 
@@ -59,7 +59,7 @@ class API_Handler
     {
         return !empty($this->api_base_url) && !empty($this->api_key);
     }
-    
+
     /**
      * Get available locations
      * 
@@ -69,7 +69,7 @@ class API_Handler
     {
         return $this->make_request('GET', '/locations');
     }
-    
+
     /**
      * Get available sessions for a date
      * 
@@ -82,7 +82,7 @@ class API_Handler
             'date' => $date
         ]);
     }
-    
+
     /**
      * Get attendee options
      * 
@@ -92,29 +92,70 @@ class API_Handler
     {
         return $this->make_request('GET', '/attendees');
     }
-    
+
     /**
-     * Get tent information
-     * 
-     * @param string $location Location ID (optional)
-     * @param string $date Date in Y-m-d format (optional)
+     * Get tents from API or dummy data
+     *
      * @return array
      */
-    public function get_tents($location = '', $date = '')
+    public function get_tents()
     {
-        $params = [];
-        
-        if (!empty($location)) {
-            $params['location'] = $location;
+        if ($this->is_configured()) {
+            $url = rtrim($this->api_base_url, '/') . '/tents';
+            $args = [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->api_key,
+                    'Accept' => 'application/json',
+                ]
+            ];
+            $response = wp_remote_get($url, $args);
+            if (!is_wp_error($response)) {
+                $data = json_decode(wp_remote_retrieve_body($response), true);
+                if (is_array($data)) {
+                    // Normalize API response if needed
+                    return $data;
+                }
+            }
         }
-        
-        if (!empty($date)) {
-            $params['date'] = $date;
-        }
-        
-        return $this->make_request('GET', '/tents', $params);
+        // Fallback to dummy data
+        return self::get_local_tents();
     }
-    
+
+    /**
+     * Get seasons (date ranges) from API or dummy data
+     *
+     * @return array
+     */
+    public function get_seasons()
+    {
+        if ($this->is_configured()) {
+            $url = rtrim($this->api_base_url, '/') . '/seasons';
+            $args = [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->api_key,
+                    'Accept' => 'application/json',
+                ]
+            ];
+            $response = wp_remote_get($url, $args);
+            if (!is_wp_error($response)) {
+                $data = json_decode(wp_remote_retrieve_body($response), true);
+                if (is_array($data)) {
+                    return $data;
+                }
+            }
+        }
+        // Fallback to WP options or dummy
+        $date_ranges = get_option('oktoberfest_date_ranges');
+        if (!is_array($date_ranges)) {
+            $date_ranges = [[
+                'year' => '2025',
+                'start_date' => '2025-09-20',
+                'end_date' => '2025-10-05'
+            ]];
+        }
+        return $date_ranges;
+    }
+
     /**
      * Submit booking
      * 
@@ -125,7 +166,7 @@ class API_Handler
     {
         return $this->make_request('POST', '/bookings', $booking_data);
     }
-    
+
     /**
      * API request
      * 
@@ -140,9 +181,9 @@ class API_Handler
         if (!$this->is_configured()) {
             return $this->get_dummy_data($endpoint, $params);
         }
-        
+
         $url = $this->api_base_url . $endpoint;
-        
+
         $args = [
             'method' => $method,
             'timeout' => 30,
@@ -155,15 +196,15 @@ class API_Handler
                 'Accept' => 'application/json',
             ],
         ];
-        
+
         if ('GET' === $method && !empty($params)) {
             $url = add_query_arg($params, $url);
         } elseif ('POST' === $method && !empty($params)) {
             $args['body'] = json_encode($params);
         }
-        
+
         $response = wp_remote_request($url, $args);
-        
+
         if (is_wp_error($response)) {
             error_log('Oktoberfest VIP API Error: ' . $response->get_error_message());
             return [
@@ -171,9 +212,9 @@ class API_Handler
                 'message' => $response->get_error_message()
             ];
         }
-        
+
         $response_code = wp_remote_retrieve_response_code($response);
-        
+
         if ($response_code < 200 || $response_code >= 300) {
             error_log('Oktoberfest VIP API Error: ' . $response_code);
             return [
@@ -181,10 +222,10 @@ class API_Handler
                 'message' => 'API returned error code: ' . $response_code
             ];
         }
-        
+
         $body = wp_remote_retrieve_body($response);
         $data = json_decode($body, true);
-        
+
         if (!$data) {
             error_log('Oktoberfest VIP API Error: Invalid JSON response');
             return [
@@ -192,13 +233,13 @@ class API_Handler
                 'message' => 'Invalid API response'
             ];
         }
-        
+
         return [
             'success' => true,
             'data' => $data
         ];
     }
-    
+
     /**
      * Dummy data for development
      * 
@@ -284,12 +325,12 @@ class API_Handler
                 ]
             ]
         ];
-        
+
         // Return dummy data for the specified endpoint
         if (isset($dummy_data[$endpoint])) {
             return $dummy_data[$endpoint];
         }
-        
+
         // Default dummy response
         return [
             'success' => false,
@@ -298,42 +339,44 @@ class API_Handler
     }
 
     /**
-     * Get local tent data (for use in widgets)
+     * Deprecated: Use get_tents() instead.
      *
      * @return array
      */
     public static function get_local_tents()
     {
+        $base_url = plugin_dir_url(__FILE__) . '../assets/images/';
+        $base_url = str_replace('includes/', '', $base_url); // Normalize path if needed
         return [
             [
                 'id' => 'armbrustschutzenzelt',
                 'name' => 'Armbrustschützenzelt',
-                'image' => plugin_dir_url(dirname(__DIR__)) . 'assets/images/tent1.jpg'
+                'image' => $base_url . 'tent1.jpg'
             ],
             [
                 'id' => 'augustiner',
                 'name' => 'Augustiner-Festhalle',
-                'image' => plugin_dir_url(dirname(__DIR__)) . 'assets/images/tent2.jpg'
+                'image' => $base_url . 'tent2.jpg'
             ],
             [
                 'id' => 'fischer-vroni',
                 'name' => 'Fischer-Vroni',
-                'image' => plugin_dir_url(dirname(__DIR__)) . 'assets/images/tent3.jpg'
+                'image' => $base_url . 'tent3.jpg'
             ],
             [
                 'id' => 'hacker-festzelt',
                 'name' => 'Hacker-Festzelt',
-                'image' => plugin_dir_url(dirname(__DIR__)) . 'assets/images/tent1.jpg'
+                'image' => $base_url . 'tent1.jpg'
             ],
             [
                 'id' => 'hofbrau',
                 'name' => 'Hofbräu-Festzelt',
-                'image' => plugin_dir_url(dirname(__DIR__)) . 'assets/images/tent2.jpg'
+                'image' => $base_url . 'tent2.jpg'
             ],
             [
                 'id' => 'kafer-wiesn-schanke',
                 'name' => 'Käfer Wiesn-Schänke',
-                'image' => plugin_dir_url(dirname(__DIR__)) . 'assets/images/tent3.jpg'
+                'image' => $base_url . 'tent3.jpg'
             ]
         ];
     }

@@ -121,16 +121,14 @@
             if (!this.form.length) return;
             this.bindEvents();
             this.initCalendar();
-            this.updateSummary();
         },
         cacheDom() {
-            this.form = $('#vip-booking-form');
+            this.form = $('#everliz-booking-form');
             this.tentGallery = $('#tent-gallery');
             this.tentCards = $('.tent-card');
             this.tentPreferenceRadios = $('input[name="tent_preference"]');
             this.selectedTentInput = $('#selected-tent');
             this.selectedDateInput = $('input[name="selected_date"]');
-            this.summary = $('#booking-summary');
         },
         bindEvents() {
             this.form.on('submit', e => this.handleSubmit(e));
@@ -173,7 +171,6 @@
         },
         updateUrlAndSummary() {
             this.updateUrl();
-            this.updateSummary();
         },
         updateUrl() {
             const date = this.selectedDateInput.val();
@@ -182,30 +179,6 @@
             if (date) params.set('date', btoa(date));
             if (tent) params.set('location', btoa(tent));
             history.replaceState(null, '', '?' + params.toString());
-        },
-        updateSummary() {
-            if (!this.summary.length) return;
-            const tentId = this.selectedTentInput.val();
-            const date = this.selectedDateInput.val();
-            let tentName = '', tentImg = '';
-            if (window.EverlizTents && tentId && tentId !== 'any') {
-                const tent = window.EverlizTents.find(t => t.id === tentId);
-                if (tent) {
-                    tentName = tent.name;
-                    tentImg = tent.image;
-                }
-            } else if (tentId === 'any') {
-                tentName = 'Any Tent';
-            }
-            let dateStr = '';
-            if (date) {
-                const d = new Date(date);
-                dateStr = d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            }
-            let html = tentImg ? `<img src="${tentImg}" alt="${tentName}" style="max-width:60px;max-height:60px;border-radius:8px;margin-right:1em;vertical-align:middle;">` : '';
-            html += `<strong>${tentName}</strong>`;
-            if (dateStr) html += ` <span style="color:#aaa;">on</span> <strong>${dateStr}</strong>`;
-            this.summary.html(html);
         },
         handleSubmit(e) {
             e.preventDefault();

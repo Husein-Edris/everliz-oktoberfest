@@ -77,8 +77,9 @@ class Search_Form_Widget extends \Elementor\Widget_Base
         $booking_page_id = isset($general_settings['booking_page']) ? $general_settings['booking_page'] : 0;
         $booking_page_url = $booking_page_id ? get_permalink($booking_page_id) : home_url('/booking/');
 
-        // Get date ranges from WordPress options with proper type checking
-        $date_ranges = get_option('oktoberfest_date_ranges');
+        // Get date ranges from API or fallback
+        $api_handler = \Oktoberfest_VIP\API_Handler::instance();
+        $date_ranges = $api_handler->get_seasons();
         if (!is_array($date_ranges)) {
             $date_ranges = [[
                 'year' => '2025',
@@ -109,6 +110,10 @@ class Search_Form_Widget extends \Elementor\Widget_Base
                 }
             }
         }
+
+        // Get tents from API or fallback
+        $tents = $api_handler->get_tents();
+
 ?>
 
         <div class="everliz-search-form">
@@ -133,7 +138,6 @@ class Search_Form_Widget extends \Elementor\Widget_Base
                         <option value="">Select a tent</option>
                         <option value="any">Any Tent</option>
                         <?php
-                        $tents = API_Handler::get_local_tents();
                         foreach ($tents as $tent) : ?>
                             <option value="<?php echo esc_attr($tent['id']); ?>"><?php echo esc_html($tent['name']); ?></option>
                         <?php endforeach; ?>

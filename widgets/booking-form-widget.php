@@ -4,6 +4,8 @@ namespace Everliz_Oktoberfest;
 
 if (!defined('ABSPATH')) exit;
 
+use Oktoberfest_VIP\API_Handler;
+
 class Booking_Form_Widget extends \Elementor\Widget_Base
 {
     public function get_name()
@@ -66,8 +68,13 @@ class Booking_Form_Widget extends \Elementor\Widget_Base
         // Default tent preference
         $tent_preference = !empty($location) && $location !== 'any' ? 'specific' : 'any';
 
+        $tents = API_Handler::get_local_tents();
 ?>
         <div class="booking-form-container">
+            <div id="booking-summary" style="margin-bottom:2em;"></div>
+            <script>
+                window.EverlizTents = <?php echo json_encode($tents); ?>;
+            </script>
             <div class="calendar-section">
                 <div class="calendar-wrapper" id="oktoberfest-calendar">
                     <!-- Calendar -->
@@ -203,40 +210,6 @@ class Booking_Form_Widget extends \Elementor\Widget_Base
                     <div class="tent-gallery" id="tent-gallery"
                         style="<?php echo ($tent_preference === 'any') ? 'display: none;' : ''; ?>">
                         <?php
-                        // Use placeholder images for tents
-                        $tents = [
-                            [
-                                'id' => 'armbrustschutzenzelt',
-                                'name' => 'Armbrustschützenzelt',
-                                'image' => plugin_dir_url(dirname(__FILE__)) . 'assets/images/tent1.jpg'
-                            ],
-                            [
-                                'id' => 'augustiner',
-                                'name' => 'Augustiner-Festhalle',
-                                'image' => plugin_dir_url(dirname(__FILE__)) . 'assets/images/tent2.jpg'
-                            ],
-                            [
-                                'id' => 'fischer-vroni',
-                                'name' => 'Fischer-Vroni',
-                                'image' => plugin_dir_url(dirname(__FILE__)) . 'assets/images/tent3.jpg'
-                            ],
-                            [
-                                'id' => 'hacker-festzelt',
-                                'name' => 'Hacker-Festzelt',
-                                'image' => plugin_dir_url(dirname(__FILE__)) . 'assets/images/tent1.jpg'
-                            ],
-                            [
-                                'id' => 'hofbrau',
-                                'name' => 'Hofbräu-Festzelt',
-                                'image' => plugin_dir_url(dirname(__FILE__)) . 'assets/images/tent2.jpg'
-                            ],
-                            [
-                                'id' => 'kafer-wiesn-schanke',
-                                'name' => 'Käfer Wiesn-Schänke',
-                                'image' => plugin_dir_url(dirname(__FILE__)) . 'assets/images/tent3.jpg'
-                            ]
-                        ];
-
                         foreach ($tents as $tent) : ?>
                             <div class="tent-card <?php echo ($location === $tent['id']) ? 'selected' : ''; ?>"
                                 data-tent-id="<?php echo esc_attr($tent['id']); ?>">

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * API Handler Class
  * 
@@ -9,7 +10,8 @@ namespace Oktoberfest_VIP;
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
-class API_Handler {
+class API_Handler
+{
     /**
      * @var API_Handler Singleton instance
      */
@@ -30,7 +32,8 @@ class API_Handler {
      * 
      * @return API_Handler
      */
-    public static function instance() {
+    public static function instance()
+    {
         if (null === self::$instance) {
             self::$instance = new self();
         }
@@ -40,7 +43,8 @@ class API_Handler {
     /**
      * Constructor
      */
-    private function __construct() {
+    private function __construct()
+    {
         $options = get_option('oktoberfest_vip_settings', []);
         $this->api_base_url = isset($options['api_url']) ? rtrim($options['api_url'], '/') : '';
         $this->api_key = isset($options['api_key']) ? $options['api_key'] : '';
@@ -51,7 +55,8 @@ class API_Handler {
      * 
      * @return bool
      */
-    public function is_configured() {
+    public function is_configured()
+    {
         return !empty($this->api_base_url) && !empty($this->api_key);
     }
     
@@ -60,7 +65,8 @@ class API_Handler {
      * 
      * @return array
      */
-    public function get_locations() {
+    public function get_locations()
+    {
         return $this->make_request('GET', '/locations');
     }
     
@@ -70,7 +76,8 @@ class API_Handler {
      * @param string $date Date in Y-m-d format
      * @return array
      */
-    public function get_sessions($date) {
+    public function get_sessions($date)
+    {
         return $this->make_request('GET', '/sessions', [
             'date' => $date
         ]);
@@ -81,7 +88,8 @@ class API_Handler {
      * 
      * @return array
      */
-    public function get_attendee_options() {
+    public function get_attendee_options()
+    {
         return $this->make_request('GET', '/attendees');
     }
     
@@ -92,7 +100,8 @@ class API_Handler {
      * @param string $date Date in Y-m-d format (optional)
      * @return array
      */
-    public function get_tents($location = '', $date = '') {
+    public function get_tents($location = '', $date = '')
+    {
         $params = [];
         
         if (!empty($location)) {
@@ -112,7 +121,8 @@ class API_Handler {
      * @param array $booking_data Booking data
      * @return array
      */
-    public function submit_booking($booking_data) {
+    public function submit_booking($booking_data)
+    {
         return $this->make_request('POST', '/bookings', $booking_data);
     }
     
@@ -124,7 +134,8 @@ class API_Handler {
      * @param array $params Parameters
      * @return array Response data
      */
-    private function make_request($method, $endpoint, $params = []) {
+    private function make_request($method, $endpoint, $params = [])
+    {
         // Use dummy data if API is not configured
         if (!$this->is_configured()) {
             return $this->get_dummy_data($endpoint, $params);
@@ -195,7 +206,8 @@ class API_Handler {
      * @param array $params Parameters
      * @return array Dummy data
      */
-    private function get_dummy_data($endpoint, $params = []) {
+    private function get_dummy_data($endpoint, $params = [])
+    {
         $dummy_data = [
             '/locations' => [
                 'success' => true,
@@ -282,6 +294,47 @@ class API_Handler {
         return [
             'success' => false,
             'message' => 'Endpoint not found in dummy data'
+        ];
+    }
+
+    /**
+     * Get local tent data (for use in widgets)
+     *
+     * @return array
+     */
+    public static function get_local_tents()
+    {
+        return [
+            [
+                'id' => 'armbrustschutzenzelt',
+                'name' => 'Armbrustschützenzelt',
+                'image' => plugin_dir_url(dirname(__DIR__)) . 'assets/images/tent1.jpg'
+            ],
+            [
+                'id' => 'augustiner',
+                'name' => 'Augustiner-Festhalle',
+                'image' => plugin_dir_url(dirname(__DIR__)) . 'assets/images/tent2.jpg'
+            ],
+            [
+                'id' => 'fischer-vroni',
+                'name' => 'Fischer-Vroni',
+                'image' => plugin_dir_url(dirname(__DIR__)) . 'assets/images/tent3.jpg'
+            ],
+            [
+                'id' => 'hacker-festzelt',
+                'name' => 'Hacker-Festzelt',
+                'image' => plugin_dir_url(dirname(__DIR__)) . 'assets/images/tent1.jpg'
+            ],
+            [
+                'id' => 'hofbrau',
+                'name' => 'Hofbräu-Festzelt',
+                'image' => plugin_dir_url(dirname(__DIR__)) . 'assets/images/tent2.jpg'
+            ],
+            [
+                'id' => 'kafer-wiesn-schanke',
+                'name' => 'Käfer Wiesn-Schänke',
+                'image' => plugin_dir_url(dirname(__DIR__)) . 'assets/images/tent3.jpg'
+            ]
         ];
     }
 }

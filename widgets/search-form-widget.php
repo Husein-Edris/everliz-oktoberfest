@@ -4,6 +4,8 @@ namespace Everliz_Oktoberfest;
 
 if (!defined('ABSPATH')) exit;
 
+use Oktoberfest_VIP\API_Handler;
+
 class Search_Form_Widget extends \Elementor\Widget_Base
 {
     public function get_name()
@@ -128,11 +130,13 @@ class Search_Form_Widget extends \Elementor\Widget_Base
                 <div class="form-group">
                     <label><?php echo esc_html($settings['location_placeholder']); ?></label>
                     <select name="location" id="tent" required>
-                        <option value=""><?php echo esc_html($settings['location_placeholder']); ?></option>
+                        <option value="">Select a tent</option>
                         <option value="any">Any Tent</option>
-                        <option value="hofbrau">Hofbräu-Festzelt</option>
-                        <option value="augustiner">Augustiner-Festhalle</option>
-                        <option value="paulaner">Paulaner-Festzelt</option>
+                        <?php
+                        $tents = API_Handler::get_local_tents();
+                        foreach ($tents as $tent) : ?>
+                            <option value="<?php echo esc_attr($tent['id']); ?>"><?php echo esc_html($tent['name']); ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
 

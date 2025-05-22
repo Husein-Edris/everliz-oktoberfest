@@ -100,9 +100,9 @@ class Oktoberfest_VIP_Booking
 
     public function register_widgets($widgets_manager)
     {
+        require_once($this->plugin_path . '/includes/class-api-handler.php');
         require_once($this->plugin_path . '/widgets/search-form-widget.php');
         require_once($this->plugin_path . '/widgets/booking-form-widget.php');
-
         $widgets_manager->register(new \Everliz_Oktoberfest\Search_Form_Widget());
         $widgets_manager->register(new \Everliz_Oktoberfest\Booking_Form_Widget());
     }
@@ -219,26 +219,26 @@ class Oktoberfest_VIP_Booking
 
         $active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
 ?>
-        <div class="wrap oktoberfest-settings">
-            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+<div class="wrap oktoberfest-settings">
+    <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 
-            <h2 class="nav-tab-wrapper">
-                <a href="?page=oktoberfest-settings&tab=general"
-                    class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>">
-                    General Settings
-                </a>
-                <a href="?page=oktoberfest-settings&tab=date_ranges"
-                    class="nav-tab <?php echo $active_tab == 'date_ranges' ? 'nav-tab-active' : ''; ?>">
-                    Date Ranges
-                </a>
-                <a href="?page=oktoberfest-settings&tab=api"
-                    class="nav-tab <?php echo $active_tab == 'api' ? 'nav-tab-active' : ''; ?>">
-                    API Settings
-                </a>
-            </h2>
+    <h2 class="nav-tab-wrapper">
+        <a href="?page=oktoberfest-settings&tab=general"
+            class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>">
+            General Settings
+        </a>
+        <a href="?page=oktoberfest-settings&tab=date_ranges"
+            class="nav-tab <?php echo $active_tab == 'date_ranges' ? 'nav-tab-active' : ''; ?>">
+            Date Ranges
+        </a>
+        <a href="?page=oktoberfest-settings&tab=api"
+            class="nav-tab <?php echo $active_tab == 'api' ? 'nav-tab-active' : ''; ?>">
+            API Settings
+        </a>
+    </h2>
 
-            <form method="post" action="options.php" class="oktoberfest-form">
-                <?php
+    <form method="post" action="options.php" class="oktoberfest-form">
+        <?php
                 settings_fields('oktoberfest_settings');
 
                 if ($active_tab == 'general') {
@@ -251,23 +251,23 @@ class Oktoberfest_VIP_Booking
 
                 submit_button('Save Settings');
                 ?>
-            </form>
-        </div>
-    <?php
+    </form>
+</div>
+<?php
     }
 
     private function render_general_tab()
     {
         $general_settings = get_option('oktoberfest_general_settings', []);
     ?>
-        <div class="general-settings-container">
-            <table class="form-table">
-                <tr>
-                    <th scope="row">
-                        <label for="booking_page">Booking Page</label>
-                    </th>
-                    <td>
-                        <?php
+<div class="general-settings-container">
+    <table class="form-table">
+        <tr>
+            <th scope="row">
+                <label for="booking_page">Booking Page</label>
+            </th>
+            <td>
+                <?php
                         wp_dropdown_pages([
                             'name' => 'oktoberfest_general_settings[booking_page]',
                             'id' => 'booking_page',
@@ -277,21 +277,21 @@ class Oktoberfest_VIP_Booking
                             'class' => 'regular-text'
                         ]);
                         ?>
-                        <p class="description">Select the page where your booking form is displayed.</p>
-                        <div class="page-actions">
-                            <a href="<?php echo admin_url('post-new.php?post_type=page'); ?>" class="button">Create New Page</a>
-                            <?php if (!empty($general_settings['booking_page'])) : ?>
-                                <a href="<?php echo get_edit_post_link($general_settings['booking_page']); ?>" class="button">Edit
-                                    Page</a>
-                                <a href="<?php echo get_permalink($general_settings['booking_page']); ?>" class="button"
-                                    target="_blank">View Page</a>
-                            <?php endif; ?>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    <?php
+                <p class="description">Select the page where your booking form is displayed.</p>
+                <div class="page-actions">
+                    <a href="<?php echo admin_url('post-new.php?post_type=page'); ?>" class="button">Create New Page</a>
+                    <?php if (!empty($general_settings['booking_page'])) : ?>
+                    <a href="<?php echo get_edit_post_link($general_settings['booking_page']); ?>" class="button">Edit
+                        Page</a>
+                    <a href="<?php echo get_permalink($general_settings['booking_page']); ?>" class="button"
+                        target="_blank">View Page</a>
+                    <?php endif; ?>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+<?php
     }
 
     private function render_date_ranges_tab()
@@ -308,97 +308,97 @@ class Oktoberfest_VIP_Booking
             ]];
         }
     ?>
-        <div class="date-ranges-container">
-            <div class="date-ranges-header">
-                <h3>Event Date Ranges</h3>
-                <p class="description">Set the date ranges for each year's Oktoberfest event.</p>
-            </div>
+<div class="date-ranges-container">
+    <div class="date-ranges-header">
+        <h3>Event Date Ranges</h3>
+        <p class="description">Set the date ranges for each year's Oktoberfest event.</p>
+    </div>
 
-            <div class="date-ranges-table-container">
-                <table id="oktoberfest-dates">
-                    <thead>
-                        <tr>
-                            <th>Year</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($date_ranges as $index => $range) : ?>
-                            <tr class="date-range-row">
-                                <td>
-                                    <input type="number" name="oktoberfest_date_ranges[<?php echo $index; ?>][year]"
-                                        value="<?php echo esc_attr($range['year']); ?>" min="2025" max="2028" required>
-                                </td>
-                                <td>
-                                    <input type="date" name="oktoberfest_date_ranges[<?php echo $index; ?>][start_date]"
-                                        value="<?php echo esc_attr($range['start_date']); ?>" required>
-                                </td>
-                                <td>
-                                    <input type="date" name="oktoberfest_date_ranges[<?php echo $index; ?>][end_date]"
-                                        value="<?php echo esc_attr($range['end_date']); ?>" required>
-                                </td>
-                                <td>
-                                    <button type="button" class="button remove-date-range">
-                                        <span class="dashicons dashicons-trash"></span>
-                                        Remove
-                                    </button>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
+    <div class="date-ranges-table-container">
+        <table id="oktoberfest-dates">
+            <thead>
+                <tr>
+                    <th>Year</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($date_ranges as $index => $range) : ?>
+                <tr class="date-range-row">
+                    <td>
+                        <input type="number" name="oktoberfest_date_ranges[<?php echo $index; ?>][year]"
+                            value="<?php echo esc_attr($range['year']); ?>" min="2025" max="2028" required>
+                    </td>
+                    <td>
+                        <input type="date" name="oktoberfest_date_ranges[<?php echo $index; ?>][start_date]"
+                            value="<?php echo esc_attr($range['start_date']); ?>" required>
+                    </td>
+                    <td>
+                        <input type="date" name="oktoberfest_date_ranges[<?php echo $index; ?>][end_date]"
+                            value="<?php echo esc_attr($range['end_date']); ?>" required>
+                    </td>
+                    <td>
+                        <button type="button" class="button remove-date-range">
+                            <span class="dashicons dashicons-trash"></span>
+                            Remove
+                        </button>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
 
-            <div class="date-ranges-actions">
-                <button type="button" class="button button-primary" id="add-date-range">
-                    <span class="dashicons dashicons-plus-alt2"></span>
-                    Add Date Range
-                </button>
-            </div>
-        </div>
-    <?php
+    <div class="date-ranges-actions">
+        <button type="button" class="button button-primary" id="add-date-range">
+            <span class="dashicons dashicons-plus-alt2"></span>
+            Add Date Range
+        </button>
+    </div>
+</div>
+<?php
     }
 
     private function render_api_settings_tab()
     {
         $api_settings = get_option('oktoberfest_api_settings', []);
     ?>
-        <div class="api-settings-container">
-            <table class="form-table">
-                <tr>
-                    <th scope="row">
-                        <label for="api_key">API Key</label>
-                    </th>
-                    <td>
-                        <input type="text" id="api_key" name="oktoberfest_api_settings[api_key]"
-                            value="<?php echo esc_attr($api_settings['api_key'] ?? ''); ?>" class="regular-text">
-                        <p class="description">Enter your API key for authentication.</p>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="api_secret">API Secret</label>
-                    </th>
-                    <td>
-                        <input type="password" id="api_secret" name="oktoberfest_api_settings[api_secret]"
-                            value="<?php echo esc_attr($api_settings['api_secret'] ?? ''); ?>" class="regular-text">
-                        <p class="description">Enter your API secret key.</p>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <label for="api_endpoint">API Endpoint</label>
-                    </th>
-                    <td>
-                        <input type="url" id="api_endpoint" name="oktoberfest_api_settings[api_endpoint]"
-                            value="<?php echo esc_url($api_settings['api_endpoint'] ?? ''); ?>" class="regular-text">
-                        <p class="description">Enter the API endpoint URL.</p>
-                    </td>
-                </tr>
-            </table>
-        </div>
+<div class="api-settings-container">
+    <table class="form-table">
+        <tr>
+            <th scope="row">
+                <label for="api_key">API Key</label>
+            </th>
+            <td>
+                <input type="text" id="api_key" name="oktoberfest_api_settings[api_key]"
+                    value="<?php echo esc_attr($api_settings['api_key'] ?? ''); ?>" class="regular-text">
+                <p class="description">Enter your API key for authentication.</p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="api_secret">API Secret</label>
+            </th>
+            <td>
+                <input type="password" id="api_secret" name="oktoberfest_api_settings[api_secret]"
+                    value="<?php echo esc_attr($api_settings['api_secret'] ?? ''); ?>" class="regular-text">
+                <p class="description">Enter your API secret key.</p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="api_endpoint">API Endpoint</label>
+            </th>
+            <td>
+                <input type="url" id="api_endpoint" name="oktoberfest_api_settings[api_endpoint]"
+                    value="<?php echo esc_url($api_settings['api_endpoint'] ?? ''); ?>" class="regular-text">
+                <p class="description">Enter the API endpoint URL.</p>
+            </td>
+        </tr>
+    </table>
+</div>
 <?php
     }
 }

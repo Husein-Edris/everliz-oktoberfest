@@ -116,72 +116,44 @@
      * Booking Form Widget (Widget 2)
      */
     const BookingFormWidget = {
-        init: function() {
+        init() {
+            this.cacheDom();
+            if (!this.form.length) return;
+            this.bindEvents();
+            this.initCalendar();
+            this.updateSummary();
+        },
+        cacheDom() {
             this.form = $('#vip-booking-form');
             this.tentGallery = $('#tent-gallery');
             this.tentCards = $('.tent-card');
             this.tentPreferenceRadios = $('input[name="tent_preference"]');
             this.selectedTentInput = $('#selected-tent');
-            
-            if (this.form.length) {
-                this.bindEvents();
-                this.initCalendar();
-            }
+            this.selectedDateInput = $('input[name="selected_date"]');
+            this.summary = $('#booking-summary');
         },
-        
-        bindEvents: function() {
-            this.form.on('submit', this.handleSubmit.bind(this));
-            
-            // Make the entire .preference-option clickable
-            $('.preference-option').on('click', (e) => {
-                // Prevent double firing if the radio is clicked directly
+        bindEvents() {
+            this.form.on('submit', e => this.handleSubmit(e));
+            $('.preference-option').on('click', e => {
                 if (!$(e.target).is('input[type="radio"]')) {
                     $(e.currentTarget).find('input[type="radio"]').prop('checked', true).trigger('change');
                 }
             });
-
-            // Tent preference selection
-            this.tentPreferenceRadios.on('change', (e) => {
-                // Remove selected from all
-                $('.tent-preference .preference-option').removeClass('selected');
-                $('.tent-preference .radio-col').removeClass('selected');
-                // Add selected to the checked one
-                $(e.target).closest('.preference-option').addClass('selected');
-                $(e.target).closest('.radio-col').addClass('selected');
-                // Show/hide tent gallery
-                this.handleTentPreferenceChange();
-            });
-            // On page load, set selected class for checked radio
-            this.tentPreferenceRadios.each(function() {
-                if ($(this).is(':checked')) {
-                    $(this).closest('.preference-option').addClass('selected');
-                    $(this).closest('.radio-col').addClass('selected');
-                }
-            });
-            
-            // Tent card selection
-            this.tentCards.on('click', this.handleTentCardClick.bind(this));
+            this.tentPreferenceRadios.on('change', e => this.handlePreferenceChange(e));
+            this.tentCards.on('click', e => this.handleTentCardClick(e));
+            this.selectedDateInput.on('change', () => this.updateUrlAndSummary());
         },
-        
-        initCalendar: function() {
-            const selectedDate = $('input[name="selected_date"]').val();
-            
-            // This would be expanded to include a full calendar implementation
-            // For now, we'll just highlight the selected date in the calendar
-            if (selectedDate) {
-                const day = new Date(selectedDate).getDate();
-                $('.calendar-dates div').each(function() {
-                    if (parseInt($(this).text()) === day) {
-                        $(this).addClass('selected');
-                    }
-                });
-            }
+        handlePreferenceChange(e) {
+            this.tentPreferenceRadios.closest('.preference-option').removeClass('selected');
+            this.tentPreferenceRadios.closest('.radio-col').removeClass('selected');
+            $(e.target).closest('.preference-option').addClass('selected');
+            $(e.target).closest('.radio-col').addClass('selected');
+            this.handleTentGallery();
+            this.updateUrlAndSummary();
         },
-        
-        handleTentPreferenceChange: function() {
-            const preference = $('input[name="tent_preference"]:checked').val();
-            
-            if (preference === 'specific') {
+        handleTentGallery() {
+            const pref = this.tentPreferenceRadios.filter(':checked').val();
+            if (pref === 'specific') {
                 this.tentGallery.slideDown();
             } else {
                 this.tentGallery.slideUp();
@@ -189,40 +161,59 @@
                 this.tentCards.removeClass('selected');
             }
         },
-        
-        handleTentCardClick: function(e) {
+        handleTentCardClick(e) {
             const tentCard = $(e.currentTarget);
             const tentId = tentCard.data('tent-id');
-            
-            // Ensure specific tent preference is selected
-            this.tentPreferenceRadios.filter('[value="specific"]').prop('checked', true);
-            
-            // Update selected tent
+            this.tentPreferenceRadios.filter('[value="specific"]').prop('checked', true).trigger('change');
             this.tentCards.removeClass('selected');
             tentCard.addClass('selected');
             this.selectedTentInput.val(tentId);
-            
-            // Show tent gallery if it was hidden
             this.tentGallery.slideDown();
+            this.updateUrlAndSummary();
         },
-        
-        handleSubmit: function(e) {
-            e.preventDefault();
-            
-            // Validate form
-            if (!this.validateForm()) {
-                return;
+        updateUrlAndSummary() {
+            this.updateUrl();
+            this.updateSummary();
+        },
+        updateUrl() {
+            const date = this.selectedDateInput.val();
+            const tent = this.selectedTentInput.val();
+            const params = new URLSearchParams(window.location.search);
+            if (date) params.set('date', btoa(date));
+            if (tent) params.set('location', btoa(tent));
+            history.replaceState(null, '', '?' + params.toString());
+        },
+        updateSummary() {
+            if (!this.summary.length) return;
+            const tentId = this.selectedTentInput.val();
+            const date = this.selectedDateInput.val();
+            let tentName = '', tentImg = '';
+            if (window.EverlizTents && tentId && tentId !== 'any') {
+                const tent = window.EverlizTents.find(t => t.id === tentId);
+                if (tent) {
+                    tentName = tent.name;
+                    tentImg = tent.image;
+                }
+            } else if (tentId === 'any') {
+                tentName = 'Any Tent';
             }
-            
-            // Get form data
+            let dateStr = '';
+            if (date) {
+                const d = new Date(date);
+                dateStr = d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            }
+            let html = tentImg ? `<img src="${tentImg}" alt="${tentName}" style="max-width:60px;max-height:60px;border-radius:8px;margin-right:1em;vertical-align:middle;">` : '';
+            html += `<strong>${tentName}</strong>`;
+            if (dateStr) html += ` <span style="color:#aaa;">on</span> <strong>${dateStr}</strong>`;
+            this.summary.html(html);
+        },
+        handleSubmit(e) {
+            e.preventDefault();
+            if (!this.validateForm()) return;
             const formData = new FormData(this.form[0]);
             formData.append('action', 'oktoberfest_vip_submit_booking');
             formData.append('nonce', OktoberfestVIP.nonce);
-            
-            // Show loading state
             this.setFormLoading(true);
-            
-            // Submit the form
             $.ajax({
                 url: OktoberfestVIP.ajaxurl,
                 type: 'POST',
@@ -233,14 +224,10 @@
                 error: this.handleSubmitError.bind(this)
             });
         },
-        
-        validateForm: function() {
+        validateForm() {
             let isValid = true;
-            
-            // Validate required fields
             this.form.find('[required]').each(function() {
                 const field = $(this);
-                
                 if (!field.val()) {
                     BookingFormWidget.showError(field, 'This field is required');
                     isValid = false;
@@ -248,53 +235,25 @@
                     BookingFormWidget.clearError(field);
                 }
             });
-            
-            // Validate email format
             const emailField = this.form.find('input[type="email"]');
             if (emailField.val() && !this.isValidEmail(emailField.val())) {
                 this.showError(emailField, 'Please enter a valid email address');
                 isValid = false;
             }
-            
-            // Validate tent selection if specific preference is chosen
             if (this.tentPreferenceRadios.filter(':checked').val() === 'specific' && !this.selectedTentInput.val()) {
                 this.showError(this.tentGallery, 'Please select a tent');
                 isValid = false;
             } else {
                 this.clearError(this.tentGallery);
             }
-            
             return isValid;
         },
-        
-        isValidEmail: function(email) {
+        isValidEmail(email) {
             const regex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
             return regex.test(email);
         },
-        
-        handleSubmitSuccess: function(response) {
-            this.setFormLoading(false);
-            
-            if (response.success) {
-                // Get thank you page URL from form data attribute
-                const thankYouPage = this.form.data('thank-you-page') || '/thank-you/';
-                
-                // Redirect to thank you page
-                window.location.href = thankYouPage;
-            } else {
-                // Show error message
-                this.showFormError(response.data.message || 'An error occurred. Please try again.');
-            }
-        },
-        
-        handleSubmitError: function() {
-            this.setFormLoading(false);
-            this.showFormError('Unable to process your request. Please try again later.');
-        },
-        
-        setFormLoading: function(isLoading) {
+        setFormLoading(isLoading) {
             const submitButton = this.form.find('button[type="submit"]');
-            
             if (isLoading) {
                 submitButton.prop('disabled', true).addClass('loading');
                 submitButton.html('<span class="spinner"></span> Processing...');
@@ -303,35 +262,45 @@
                 submitButton.text(submitButton.data('original-text') || 'Submit Inquiry');
             }
         },
-        
-        showFormError: function(message) {
-            // Remove existing error message
-            this.form.find('.form-error').remove();
-            
-            // Add new error message
-            const errorMessage = $('<div class="form-error">' + message + '</div>');
-            this.form.prepend(errorMessage);
-            
-            // Scroll to error message
-            $('html, body').animate({
-                scrollTop: this.form.offset().top - 100
-            }, 500);
-        },
-        
-        showError: function(element, message) {
+        showError(element, message) {
             const errorElement = $('<div class="error-message">' + message + '</div>');
             element.addClass('error');
-            
-            // Remove existing error message if any
             element.siblings('.error-message').remove();
-            
-            // Add new error message
             element.after(errorElement);
         },
-        
-        clearError: function(element) {
+        clearError(element) {
             element.removeClass('error');
             element.siblings('.error-message').remove();
+        },
+        handleSubmitSuccess(response) {
+            this.setFormLoading(false);
+            if (response.success) {
+                const thankYouPage = this.form.data('thank-you-page') || '/thank-you/';
+                window.location.href = thankYouPage;
+            } else {
+                this.showFormError(response.data.message || 'An error occurred. Please try again.');
+            }
+        },
+        handleSubmitError() {
+            this.setFormLoading(false);
+            this.showFormError('Unable to process your request. Please try again later.');
+        },
+        showFormError(message) {
+            this.form.find('.form-error').remove();
+            const errorMessage = $('<div class="form-error">' + message + '</div>');
+            this.form.prepend(errorMessage);
+            $('html, body').animate({ scrollTop: this.form.offset().top - 100 }, 500);
+        },
+        initCalendar() {
+            const selectedDate = this.selectedDateInput.val();
+            if (selectedDate) {
+                const day = new Date(selectedDate).getDate();
+                $('.calendar-dates div').each(function() {
+                    if (parseInt($(this).text()) === day) {
+                        $(this).addClass('selected');
+                    }
+                });
+            }
         }
     };
     

@@ -51,56 +51,62 @@
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             text-align: center;
+            gap: 8px;
+            margin-bottom: 0.5rem;
 
             div {
+                aspect-ratio: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1rem;
+                color: rgba(255, 255, 255, 0.5);
                 font-weight: bold;
-                color: rgba(255, 255, 255, 0.6);
+                width: 40px;
+                height: 40px;
             }
         }
 
         // Calendar dates grid
         .calendar-dates {
             display: grid;
-            justify-items: center !important;
             grid-template-columns: repeat(7, 1fr);
-            text-align: center;
-            gap: 1rem 0;
-            margin-bottom: 1rem;
+            gap: 8px;
+            margin-top: 0.5rem;
 
             div {
+                aspect-ratio: 1;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                font-size: 1rem;
+                cursor: pointer;
                 border-radius: 50%;
+                transition: all 0.2s ease;
+                color: rgba(255, 255, 255, 0.7);
+                width: 40px;
+                height: 40px;
+                background: rgba(255, 255, 255, 0.05);
 
-
-                // Empty cells
-                &.empty {
-                    display: none; // Can use visibility: hidden if grid spacing is needed
+                &:hover:not(.disabled):not(.empty) {
+                    background: rgba(#F59E0B, 0.2);
+                    color: white;
                 }
 
-                // Selectable dates
-                &.in-range {
-                    cursor: pointer;
-                    color: #fff;
-                    background-color: rgba(255, 255, 255, 0.1);
-
-                    &:hover {
-                        background-color: rgba(245, 158, 11, 0.3);
-                    }
-                }
-
-                // Disabled dates
-                &.disabled {
-                    color: rgba(255, 255, 255, 0.3);
-                    cursor: not-allowed;
-                }
-
-                // Selected date
                 &.selected {
                     background-color: #F59E0B;
-                    color: #000;
-                    font-weight: 400;
+                    color: white;
+                }
+
+                &.disabled {
+                    color: rgba(255, 255, 255, 0.2);
+                    cursor: not-allowed;
+                    background: transparent;
+                }
+
+                &.empty {
+                    pointer-events: none;
+                    background: transparent;
                 }
             }
         }

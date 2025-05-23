@@ -15,10 +15,7 @@
             this.inputField = options.inputField || $('input[name="selected_date"]');
             this.compact = options.compact || false;
             this.popupElement = options.popupElement || null;
-            
-            // Min/max years for selection
-            this.minYear = options.minYear || 2025;
-            this.maxYear = options.maxYear || 2028;
+
             
             // Store the original start and end dates
             this.originalStartDate = new Date(this.startDate);

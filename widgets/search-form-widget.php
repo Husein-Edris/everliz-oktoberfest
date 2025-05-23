@@ -4,7 +4,7 @@ namespace Everliz_Oktoberfest;
 
 if (!defined('ABSPATH')) exit;
 
-use Oktoberfest_VIP\API_Handler;
+use Everliz_Oktoberfest\API_Handler;
 
 class Search_Form_Widget extends \Elementor\Widget_Base
 {
@@ -78,7 +78,7 @@ class Search_Form_Widget extends \Elementor\Widget_Base
         $booking_page_url = $booking_page_id ? get_permalink($booking_page_id) : home_url('/booking/');
 
         // Get date ranges from API or fallback
-        $api_handler = \Oktoberfest_VIP\API_Handler::instance();
+        $api_handler = API_Handler::instance();
         $date_ranges = $api_handler->get_seasons();
         if (!is_array($date_ranges)) {
             $date_ranges = [[
@@ -114,126 +114,130 @@ class Search_Form_Widget extends \Elementor\Widget_Base
         // Get tents from API or fallback
         $tents = $api_handler->get_tents();
 
+        $years = array_keys($calendar_date_ranges);
+        $min_year = min($years);
+        $max_year = max($years);
+
 ?>
 
-        <div class="everliz-search-form">
-            <form id="search-form" method="GET" action="<?php echo esc_url($booking_page_url); ?>">
-                <div class="form-group date-picker-container">
-                    <label><?php echo esc_html($settings['date_placeholder']); ?></label>
-                    <div class="date-select-wrapper">
-                        <div class="selected-date-display" id="selected-date-display">
-                            <?php echo esc_html($settings['date_placeholder']); ?></div>
-                        <div class="date-popup" id="date-popup">
-                            <div class="calendar-wrapper" id="search-calendar">
-                                <!-- Calendar -->
-                            </div>
-                        </div>
+<div class="everliz-search-form">
+    <form id="search-form" method="GET" action="<?php echo esc_url($booking_page_url); ?>">
+        <div class="form-group date-picker-container">
+            <label><?php echo esc_html($settings['date_placeholder']); ?></label>
+            <div class="date-select-wrapper">
+                <div class="selected-date-display" id="selected-date-display">
+                    <?php echo esc_html($settings['date_placeholder']); ?></div>
+                <div class="date-popup" id="date-popup">
+                    <div class="calendar-wrapper" id="search-calendar">
+                        <!-- Calendar -->
                     </div>
-                    <input type="hidden" name="date" id="booking_date" value="">
                 </div>
-
-                <div class="form-group">
-                    <label><?php echo esc_html($settings['location_placeholder']); ?></label>
-                    <select name="location" id="tent" required>
-                        <option value="">Select a tent</option>
-                        <option value="any">Any Tent</option>
-                        <?php
-                        foreach ($tents as $tent) : ?>
-                            <option value="<?php echo esc_attr($tent['id']); ?>"><?php echo esc_html($tent['name']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <button type="submit" class="search-submit">
-                    <?php echo esc_html($settings['button_text']); ?>
-                </button>
-            </form>
+            </div>
+            <input type="hidden" name="date" id="booking_date" value="">
         </div>
-        <script>
-            jQuery(document).ready(function($) {
-                // Initialize calendar if OktoberfestCalendar is available
-                if (typeof OktoberfestCalendar !== 'undefined') {
-                    // Initialize the calendar with admin-defined date ranges
-                    OktoberfestCalendar.init({
-                        container: $('#search-calendar'),
-                        startDate: '<?php echo esc_js($start_date); ?>',
-                        endDate: '<?php echo esc_js($end_date); ?>',
-                        inputField: $('#booking_date'),
-                        compact: false,
-                        popupElement: $('#date-popup'),
-                        dateRanges: <?php echo json_encode($calendar_date_ranges); ?>,
-                        minYear: 2025,
-                        maxYear: 2028
-                    });
 
-                    // Toggle date popup
-                    $('#selected-date-display').on('click', function(e) {
-                        e.stopPropagation();
-                        $('#date-popup').toggleClass('active');
-                        return false;
-                    });
+        <div class="form-group">
+            <label><?php echo esc_html($settings['location_placeholder']); ?></label>
+            <select name="location" id="tent" required>
+                <option value="">Select a tent</option>
+                <option value="any">Any Tent</option>
+                <?php
+                        foreach ($tents as $tent) : ?>
+                <option value="<?php echo esc_attr($tent['id']); ?>"><?php echo esc_html($tent['name']); ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
 
-                    // Stop propagation on popup clicks to prevent closing
-                    $('#date-popup').on('click', function(e) {
-                        e.stopPropagation();
-                    });
+        <button type="submit" class="search-submit">
+            <?php echo esc_html($settings['button_text']); ?>
+        </button>
+    </form>
+</div>
+<script>
+jQuery(document).ready(function($) {
+    // Initialize calendar if OktoberfestCalendar is available
+    if (typeof OktoberfestCalendar !== 'undefined') {
+        // Initialize the calendar with admin-defined date ranges
+        OktoberfestCalendar.init({
+            container: $('#search-calendar'),
+            startDate: '<?php echo esc_js($start_date); ?>',
+            endDate: '<?php echo esc_js($end_date); ?>',
+            inputField: $('#booking_date'),
+            compact: false,
+            popupElement: $('#date-popup'),
+            dateRanges: <?php echo json_encode($calendar_date_ranges); ?>,
+            minYear: <?php echo (int)$min_year; ?>,
+            maxYear: <?php echo (int)$max_year; ?>,
+        });
 
-                    // Close popup when clicking outside
-                    $(document).on('click', function() {
-                        $('#date-popup').removeClass('active');
-                    });
+        // Toggle date popup
+        $('#selected-date-display').on('click', function(e) {
+            e.stopPropagation();
+            $('#date-popup').toggleClass('active');
+            return false;
+        });
 
-                    // Update selected date display when date changes
-                    $('#booking_date').on('change', function() {
-                        const dateValue = $(this).val();
-                        if (dateValue) {
-                            const dateObj = new Date(dateValue);
-                            const options = {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            };
-                            const formattedDate = dateObj.toLocaleDateString('en-US', options);
-                            $('#selected-date-display').text(formattedDate);
-                            $('#date-popup').removeClass('active');
-                        }
-                    });
-                }
+        // Stop propagation on popup clicks to prevent closing
+        $('#date-popup').on('click', function(e) {
+            e.stopPropagation();
+        });
 
-                // Form submission
-                $('#search-form').on('submit', function(e) {
-                    e.preventDefault();
+        // Close popup when clicking outside
+        $(document).on('click', function() {
+            $('#date-popup').removeClass('active');
+        });
 
-                    // Validate form
-                    if (!$('#booking_date').val()) {
-                        alert('Please select a date');
-                        return;
-                    }
+        // Update selected date display when date changes
+        $('#booking_date').on('change', function() {
+            const dateValue = $(this).val();
+            if (dateValue) {
+                const dateObj = new Date(dateValue);
+                const options = {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                };
+                const formattedDate = dateObj.toLocaleDateString('en-US', options);
+                $('#selected-date-display').text(formattedDate);
+                $('#date-popup').removeClass('active');
+            }
+        });
+    }
 
-                    if (!$('#tent').val()) {
-                        alert('Please select a tent');
-                        return;
-                    }
+    // Form submission
+    $('#search-form').on('submit', function(e) {
+        e.preventDefault();
 
-                    // Get form values
-                    const date = $('#booking_date').val();
-                    const location = $('#tent').val();
+        // Validate form
+        if (!$('#booking_date').val()) {
+            alert('Please select a date');
+            return;
+        }
 
-                    // Base64 encode the values as specified in the requirements
-                    const encodedDate = btoa(date);
-                    const encodedLocation = btoa(location);
+        if (!$('#tent').val()) {
+            alert('Please select a tent');
+            return;
+        }
 
-                    // Construct the URL with parameters
-                    const bookingUrl = '<?php echo esc_url($booking_page_url); ?>' +
-                        '?date=' + encodedDate +
-                        '&location=' + encodedLocation;
+        // Get form values
+        const date = $('#booking_date').val();
+        const location = $('#tent').val();
 
-                    // Redirect to booking page
-                    window.location.href = bookingUrl;
-                });
-            });
-        </script>
+        // Base64 encode the values as specified in the requirements
+        const encodedDate = btoa(date);
+        const encodedLocation = btoa(location);
+
+        // Construct the URL with parameters
+        const bookingUrl = '<?php echo esc_url($booking_page_url); ?>' +
+            '?date=' + encodedDate +
+            '&location=' + encodedLocation;
+
+        // Redirect to booking page
+        window.location.href = bookingUrl;
+    });
+});
+</script>
 <?php
     }
 }

@@ -6,7 +6,7 @@
  * Manages communication with the external API for the Oktoberfest VIP booking system.
  */
 
-namespace Oktoberfest_VIP;
+namespace Everliz_Oktoberfest;
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
 
@@ -128,23 +128,7 @@ class API_Handler
      */
     public function get_seasons()
     {
-        if ($this->is_configured()) {
-            $url = rtrim($this->api_base_url, '/') . '/seasons';
-            $args = [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->api_key,
-                    'Accept' => 'application/json',
-                ]
-            ];
-            $response = wp_remote_get($url, $args);
-            if (!is_wp_error($response)) {
-                $data = json_decode(wp_remote_retrieve_body($response), true);
-                if (is_array($data)) {
-                    return $data;
-                }
-            }
-        }
-        // Fallback to WP options or dummy
+        // Always use WP option, never API
         $date_ranges = get_option('oktoberfest_date_ranges');
         if (!is_array($date_ranges)) {
             $date_ranges = [[

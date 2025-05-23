@@ -124,8 +124,11 @@ class Oktoberfest_VIP_Booking
         // General Settings
         register_setting('oktoberfest_settings', 'oktoberfest_general_settings');
 
-        // Date Ranges Settings
-        register_setting('oktoberfest_settings', 'oktoberfest_date_ranges');
+        // Date Ranges Settings with robust sanitization
+        register_setting('oktoberfest_settings', 'oktoberfest_date_ranges', [
+            'type' => 'array',
+            'sanitize_callback' => [self::class, 'sanitize_date_ranges']
+        ]);
 
         // API Settings
         register_setting('oktoberfest_settings', 'oktoberfest_api_settings', [
@@ -208,6 +211,36 @@ class Oktoberfest_VIP_Booking
             $sanitized['api_endpoint'] = esc_url_raw($input['api_endpoint']);
         }
 
+        return $sanitized;
+    }
+
+    // Robust sanitization for date ranges
+    public static function sanitize_date_ranges($input)
+    {
+        $sanitized = [];
+        if (is_array($input)) {
+            foreach ($input as $row) {
+                if (
+                    !empty($row['year']) &&
+                    !empty($row['start_date']) &&
+                    !empty($row['end_date'])
+                ) {
+                    $sanitized[] = [
+                        'year' => intval($row['year']),
+                        'start_date' => sanitize_text_field($row['start_date']),
+                        'end_date' => sanitize_text_field($row['end_date'])
+                    ];
+                }
+            }
+        }
+        // Always return at least one default if empty
+        if (empty($sanitized)) {
+            $sanitized[] = [
+                'year' => 2025,
+                'start_date' => '2025-09-20',
+                'end_date' => '2025-10-05'
+            ];
+        }
         return $sanitized;
     }
 

@@ -5,7 +5,7 @@
     }
 
     th {
-        padding: 20px 10px 20px 0;
+        padding: 0;
         width: 200px;
         color: #1d2327;
         font-weight: 600;
@@ -25,10 +25,10 @@
     /* Submit Button */
     .submit {
         margin-top: 30px;
-        padding: 20px 30px;
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 0;
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
 
         .button-primary {
             padding: 6px 20px;

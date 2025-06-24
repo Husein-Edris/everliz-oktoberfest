@@ -6,42 +6,31 @@
     const OktoberfestCalendar = {
         init: function (options) {
             this.calendarEl = options.container || $('.calendar-wrapper');
-            
-            // Default start/end dates
-            this.startDate = new Date(options.startDate || '2025-09-20');
-            this.endDate = new Date(options.endDate || '2025-10-05');
-            
-            this.selectedDate = options.selectedDate ? new Date(options.selectedDate) : null;
             this.inputField = options.inputField || $('input[name="selected_date"]');
             this.compact = options.compact || false;
             this.popupElement = options.popupElement || null;
+            this.onDateSelect = options.onDateSelect || null;
 
+            // Store date ranges from admin settings
+            this.oktoberfestDates = options.dateRanges || {};
             
-            // Store the original start and end dates
-            this.originalStartDate = new Date(this.startDate);
-            this.originalEndDate = new Date(this.endDate);
+            // Get available years from date ranges
+            const availableYears = Object.keys(this.oktoberfestDates).map(year => parseInt(year)).sort();
+            this.minYear = availableYears.length > 0 ? Math.min(...availableYears) : 2025;
+            this.maxYear = availableYears.length > 0 ? Math.max(...availableYears) : 2025;
             
-            // If no date is selected or is invalid, default to start date
-            if (!this.selectedDate || isNaN(this.selectedDate.getTime()) ||
-                this.selectedDate < this.startDate || this.selectedDate > this.endDate) {
-                this.selectedDate = new Date(this.startDate);
-            }
-            
-            // Get the month and day patterns
-            this.startMonth = this.startDate.getMonth();
-            this.startDay = this.startDate.getDate();
-            this.endMonth = this.endDate.getMonth();
-            this.endDay = this.endDate.getDate();
-            
-            // Initialize with the year from start date or current date
-            this.currentYear = options.initialYear || this.startDate.getFullYear();
+            // Initialize with the year from selected date or first available year
+            this.currentYear = options.selectedDate ? new Date(options.selectedDate).getFullYear() : this.minYear;
             
             // Validate current year is within allowed range
             if (this.currentYear < this.minYear) this.currentYear = this.minYear;
             if (this.currentYear > this.maxYear) this.currentYear = this.maxYear;
-
-            // Store date ranges from admin settings
-            this.oktoberfestDates = options.dateRanges || {};
+            
+            // Set selected date if provided
+            this.selectedDate = options.selectedDate ? new Date(options.selectedDate) : null;
+            
+            // Update date range for current year
+            this.updateDateRangeForYear(this.currentYear);
             
             this.renderCalendar();
             this.bindEvents();
@@ -75,9 +64,15 @@
             // Update date range for the current year
             this.updateDateRangeForYear(this.currentYear);
             
+            // Check if we have valid dates for this year
+            if (!this.startDate || !this.endDate) {
+                this.calendarEl.append('<p class="no-dates-message">No dates available for this year.</p>');
+                return;
+            }
+            
             // Calculate the date range for this year
-            const yearStart = new Date(this.currentYear, this.startMonth, this.startDay);
-            const yearEnd = new Date(this.currentYear, this.endMonth, this.endDay);
+            const yearStart = new Date(this.startDate);
+            const yearEnd = new Date(this.endDate);
             
             // Get unique months in this range
             const months = new Set();
@@ -130,27 +125,10 @@
                 this.startDay = this.startDate.getDate();
                 this.endMonth = this.endDate.getMonth();
                 this.endDay = this.endDate.getDate();
-            } else if (year >= this.minYear && year <= this.maxYear) {
-                // If no specific dates but within allowed years, estimate based on known pattern
-                
-                // Most Oktoberfests start on the third Saturday of September
-                this.startDate = new Date(year, 8, 15); // September 15 as a starting point
-                // Find the next Saturday
-                while (this.startDate.getDay() !== 6) {
-                    this.startDate.setDate(this.startDate.getDate() + 1);
-                }
-                
-                // End date is 16 days later (typical duration)
-                this.endDate = new Date(this.startDate);
-                this.endDate.setDate(this.startDate.getDate() + 16);
-                
-                // Update month and day patterns
-                this.startMonth = this.startDate.getMonth();
-                this.startDay = this.startDate.getDate();
-                this.endMonth = this.endDate.getMonth();
-                this.endDay = this.endDate.getDate();
             } else {
-                // If outside allowed years, make no dates available
+                // If no specific dates for this year, disable all dates
+                this.startDate = null;
+                this.endDate = null;
                 this.startMonth = -1;
                 this.startDay = -1;
                 this.endMonth = -1;
@@ -297,6 +275,11 @@
                 const selectedDate = $(this).data('date');
                 self.selectedDate = new Date(selectedDate);
                 self.updateInputField();
+                
+                // Call onDateSelect callback if provided
+                if (self.onDateSelect) {
+                    self.onDateSelect(selectedDate);
+                }
                 
                 return false; // Prevent event bubbling
             });

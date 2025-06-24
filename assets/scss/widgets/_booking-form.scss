@@ -32,11 +32,17 @@
     }
 
     .calendar-wrapper {
-        width: 700px;
+        max-width: 700px;
+        width: 100%;
         border-radius: $border-radius-lg;
         padding: $spacing-md;
         margin: $spacing-xl auto;
         border: 2px solid #272E3B;
+        
+        @include mobile {
+            margin: $spacing-md auto;
+            padding: $spacing-sm;
+        }
     }
 
     .month-header {
@@ -195,9 +201,14 @@
 
     .tent-gallery {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: $spacing-xl;
         margin-bottom: $spacing-xl;
+        
+        @include mobile {
+            grid-template-columns: 1fr;
+            gap: $spacing-md;
+        }
     }
 
     .tent-card {
@@ -279,10 +290,28 @@
         .preference-option {
             flex-direction: column;
             padding: $spacing-md;
+            
+            .radio-col {
+                margin-right: 0;
+                margin-bottom: $spacing-sm;
+            }
         }
 
         .tent-card {
             height: 160px;
+        }
+        
+        .calendar-wrapper {
+            overflow-x: auto;
+        }
+    }
+    
+    @include mobile {
+        padding: $spacing-md;
+        
+        .submit-button {
+            width: 100%;
+            justify-content: center;
         }
     }
 }

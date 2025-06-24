@@ -22,7 +22,10 @@ jQuery(document).ready(function($) {
                            required>
                 </td>
                 <td>
-                    <button type="button" class="button remove-date-range">Remove</button>
+                    <button type="button" class="button remove-date-range">
+                        <span class="dashicons dashicons-trash"></span>
+                        Remove
+                    </button>
                 </td>
             </tr>
         `;

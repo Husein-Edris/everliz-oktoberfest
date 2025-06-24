@@ -1,0 +1,74 @@
+// Error handling styles
+.error-message {
+    color: $error-color;
+    font-size: $font-size-sm;
+    margin-top: $spacing-xs;
+    display: block;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.error {
+    border-color: $error-color !important;
+    box-shadow: 0 0 0 2px rgba($error-color, 0.2) !important;
+}
+
+.form-error {
+    background: rgba($error-color, 0.1);
+    border: 1px solid $error-color;
+    border-radius: $border-radius;
+    padding: $spacing-md;
+    margin-bottom: $spacing-lg;
+    color: $error-color;
+}
+
+.success-message {
+    background: #4CAF50;
+    color: white;
+    padding: $spacing-xl;
+    border-radius: $border-radius-lg;
+    text-align: center;
+    
+    h3 {
+        margin: 0 0 $spacing-sm 0;
+        color: white;
+    }
+    
+    p {
+        margin: 0;
+        opacity: 0.9;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Loading states
+.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+    
+    &::after {
+        content: '';
+        width: 16px;
+        height: 16px;
+        border: 2px solid transparent;
+        border-top: 2px solid currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        margin-left: $spacing-xs;
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

@@ -45,8 +45,8 @@ class API_Handler
      */
     private function __construct()
     {
-        $options = get_option('oktoberfest_vip_settings', []);
-        $this->api_base_url = isset($options['api_url']) ? rtrim($options['api_url'], '/') : '';
+        $options = get_option('oktoberfest_api_settings', []);
+        $this->api_base_url = isset($options['api_endpoint']) ? rtrim($options['api_endpoint'], '/') : '';
         $this->api_key = isset($options['api_key']) ? $options['api_key'] : '';
     }
 

@@ -28,17 +28,33 @@
     /* Date Ranges */
     .date-ranges-header {
         margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
 
-        h3 {
-            margin: 0 0 10px 0;
-            font-size: 18px;
-            color: #1d2327;
+        .header-content {
+            flex: 1;
+
+            h3 {
+                margin: 0 0 10px 0;
+                font-size: 18px;
+                color: #1d2327;
+            }
+
+            .description {
+                color: #646970;
+                font-size: 14px;
+                margin: 0;
+            }
         }
 
-        .description {
-            color: #646970;
-            font-size: 14px;
-            margin: 0;
+        .header-actions {
+            flex: 0 0 auto;
+            
+            .button-primary {
+                margin: 0 !important;
+            }
         }
     }
 
@@ -87,5 +103,91 @@
                 outline: none;
             }
         }
+
+        .remove-date-range {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 6px 10px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: normal;
+            transition: background-color 0.2s ease;
+            height: auto;
+            line-height: 1.3;
+
+            .dashicons {
+                font-size: 14px;
+                width: 14px;
+                height: 14px;
+                line-height: 1;
+                margin-top: -1px;
+            }
+
+            &:hover {
+                background: #5a6268;
+            }
+
+            &:focus {
+                box-shadow: 0 0 0 1px #6c757d;
+                outline: 2px solid transparent;
+            }
+        }
     }
-} 
+
+    .date-ranges-actions {
+        margin-top: 15px;
+        margin-bottom: 20px;
+
+        #add-date-range {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #2271b1;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: normal;
+            transition: background-color 0.2s ease;
+            height: auto;
+            line-height: 1.4;
+
+            .dashicons {
+                font-size: 16px;
+                width: 16px;
+                height: 16px;
+                line-height: 1;
+                margin-top: -1px;
+            }
+
+            &:hover {
+                background: #1e5f8b;
+            }
+
+            &:focus {
+                box-shadow: 0 0 0 1px #2271b1;
+                outline: 2px solid transparent;
+            }
+        }
+    }
+
+    // Style the submit buttons to be consistent
+    .button-primary {
+        &[type="submit"] {
+            font-size: 13px !important;
+            line-height: 1.4 !important;
+            height: auto !important;
+            padding: 8px 12px !important;
+            box-shadow: none !important;
+        }
+    }
+}

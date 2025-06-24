@@ -1,4 +1,337 @@
+# WordPress Plugin Development .gitignore
+
+# =============================================================================
+# DEPENDENCIES & BUILD TOOLS
+# =============================================================================
+
+# Node.js dependencies
 node_modules/
-*.log
-.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Package managers
 package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Bower
+bower_components/
+
+# Composer
+vendor/
+composer.lock
+
+# =============================================================================
+# BUILD & COMPILATION
+# =============================================================================
+
+# SCSS/SASS generated files
+*.css.map
+assets/css/*.css.map
+
+# Compiled assets (uncomment if you want to exclude compiled CSS/JS)
+# assets/css/*.css
+# assets/js/dist/
+# build/
+# dist/
+
+# Webpack
+webpack-stats.json
+
+# Gulp
+.gulp/
+
+# =============================================================================
+# DEVELOPMENT TOOLS
+# =============================================================================
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.brackets.json
+*.swp
+*.swo
+*~
+
+# Vim
+.netrwhist
+Session.vim
+
+# Emacs
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# =============================================================================
+# OPERATING SYSTEM
+# =============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.tmp
+*.temp
+desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =============================================================================
+# VERSION CONTROL
+# =============================================================================
+
+# Git
+.git/
+.gitattributes
+
+# SVN
+.svn/
+
+# Mercurial
+.hg/
+.hgignore
+
+# =============================================================================
+# LOGS & DEBUGGING
+# =============================================================================
+
+# WordPress debug logs
+debug.log
+error_log
+wp-content/debug.log
+
+# General logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# =============================================================================
+# WORDPRESS SPECIFIC
+# =============================================================================
+
+# WordPress core files (if accidentally copied)
+wp-admin/
+wp-includes/
+wp-*.php
+xmlrpc.php
+readme.html
+license.txt
+
+# WordPress config
+wp-config.php
+wp-config-local.php
+wp-config-production.php
+
+# WordPress uploads (usually not in plugin folder, but just in case)
+uploads/
+wp-content/uploads/
+
+# WordPress cache
+wp-content/cache/
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+
+# WordPress backup files
+*.sql
+*.sql.gz
+*.sql.bz2
+*.backup
+
+# =============================================================================
+# PLUGIN DEVELOPMENT SPECIFIC
+# =============================================================================
+
+# Plugin zip files
+*.zip
+
+# Documentation build
+docs/_build/
+documentation/
+
+# Test files
+tests/
+phpunit.xml
+.phpunit.result.cache
+coverage/
+.coverage
+htmlcov/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Translation files (if auto-generated)
+languages/*.pot
+languages/*.mo
+languages/*.po~
+
+# =============================================================================
+# SECURITY & SENSITIVE DATA
+# =============================================================================
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# API keys and secrets
+secrets.json
+config.json
+credentials.json
+
+# Private keys
+*.pem
+*.key
+*.p12
+*.pfx
+
+# =============================================================================
+# DEPLOYMENT & DISTRIBUTION
+# =============================================================================
+
+# Release builds
+releases/
+release/
+
+# Deployment scripts
+deploy.sh
+deploy.php
+.deploy/
+
+# FTP/SFTP sync
+.ftpconfig
+.ftppass
+.lftp/
+
+# =============================================================================
+# PERFORMANCE & OPTIMIZATION
+# =============================================================================
+
+# Image optimization
+.imageoptim
+
+# Critical CSS
+critical.css
+
+# =============================================================================
+# MISCELLANEOUS
+# =============================================================================
+
+# Archive files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port

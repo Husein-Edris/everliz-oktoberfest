@@ -182,6 +182,7 @@ class Booking_Form_Widget extends \Elementor\Widget_Base
                 <!-- Hidden fields for date and location -->
                 <input type="hidden" name="selected_date" value="<?php echo esc_attr($date); ?>">
                 <input type="hidden" name="selected_location" value="<?php echo esc_attr($location); ?>">
+                <input type="hidden" name="nonce" value="<?php echo wp_create_nonce('oktoberfest_booking_nonce'); ?>">
 
                 <!-- Attendees and Session Selection -->
                 <div class="form-row">
@@ -297,91 +298,161 @@ class Booking_Form_Widget extends \Elementor\Widget_Base
 
         <script>
             jQuery(document).ready(function($) {
-                // Initialize calendar if OktoberfestCalendar is available
-                if (typeof OktoberfestCalendar !== 'undefined') {
-                    // Initialize the calendar
-                    OktoberfestCalendar.init({
-                        container: $('#search-calendar'),
-                        startDate: '<?php echo esc_js($start_date); ?>',
-                        endDate: '<?php echo esc_js($end_date); ?>',
-                        inputField: $('#booking_date'),
-                        compact: true,
-                        popupElement: $('#date-popup')
-                    });
+                // Initialize calendar if available
+                if (typeof OktoberfestCalendar !== 'undefined' && window.OktoberfestDateRanges) {
+                    const calendarContainer = $('#oktoberfest-calendar');
+                    const selectedDateInput = $('#selected_date');
+                    
+                    if (calendarContainer.length) {
+                        OktoberfestCalendar.init({
+                            container: calendarContainer,
+                            startDate: window.OktoberfestSettings.startDate,
+                            endDate: window.OktoberfestSettings.endDate,
+                            selectedDate: window.OktoberfestSettings.selectedDate,
+                            dateRanges: window.OktoberfestDateRanges,
+                            compact: false,
+                            onDateSelect: function(selectedDate) {
+                                selectedDateInput.val(selectedDate).trigger('change');
+                            }
+                        });
+                    }
+                }
 
-                    // Toggle date popup
-                    $('#selected-date-display').on('click', function(e) {
-                        e.stopPropagation();
-                        $('#date-popup').toggleClass('active');
-                        return false;
-                    });
+                // Tent preference handling
+                $('input[name="tent_preference"]').on('change', function() {
+                    const preference = $(this).val();
+                    const tentGallery = $('#tent-gallery');
+                    const selectedTentInput = $('#selected-tent');
+                    
+                    $('.preference-option').removeClass('selected');
+                    $(this).closest('.preference-option').addClass('selected');
+                    
+                    if (preference === 'specific') {
+                        tentGallery.slideDown(300);
+                    } else {
+                        tentGallery.slideUp(300);
+                        selectedTentInput.val('any');
+                        $('.tent-card').removeClass('selected');
+                    }
+                });
 
-                    // Stop propagation on popup clicks to prevent closing
-                    $('#date-popup').on('click', function(e) {
-                        e.stopPropagation();
-                    });
+                // Tent card selection
+                $('.tent-card').on('click', function() {
+                    const tentId = $(this).data('tent-id');
+                    const selectedTentInput = $('#selected-tent');
+                    
+                    $('.tent-card').removeClass('selected');
+                    $(this).addClass('selected');
+                    selectedTentInput.val(tentId);
+                    
+                    $('input[name="tent_preference"][value="specific"]').prop('checked', true).trigger('change');
+                });
 
-                    // Close popup when clicking outside
-                    $(document).on('click', function() {
-                        $('#date-popup').removeClass('active');
-                    });
+                // Preference option click handling
+                $('.preference-option').on('click', function(e) {
+                    if (!$(e.target).is('input[type="radio"]')) {
+                        $(this).find('input[type="radio"]').prop('checked', true).trigger('change');
+                    }
+                });
 
-                    // Prevent year navigation from closing popup
-                    $(document).on('click', '.year-nav .prev-year, .year-nav .next-year', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        return false;
+                // Form submission
+                $('#everliz-booking-form').on('submit', function(e) {
+                    e.preventDefault();
+                    
+                    if (validateBookingForm()) {
+                        submitBookingForm($(this));
+                    }
+                });
+                
+                function validateBookingForm() {
+                    let isValid = true;
+                    const form = $('#everliz-booking-form');
+                    
+                    // Clear previous errors
+                    form.find('.error-message').remove();
+                    form.find('.error').removeClass('error');
+                    
+                    // Required field validation
+                    form.find('[required]').each(function() {
+                        const field = $(this);
+                        if (!field.val() || field.val().trim() === '') {
+                            showFieldError(field, 'This field is required');
+                            isValid = false;
+                        }
                     });
-
-                    // Update selected date display when date changes
-                    $('#booking_date').on('change', function() {
-                        const dateValue = $(this).val();
-                        if (dateValue) {
-                            const dateObj = new Date(dateValue);
-                            const options = {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            };
-                            const formattedDate = dateObj.toLocaleDateString('en-US', options);
-                            $('#selected-date-display').text(formattedDate);
-                            $('#date-popup').removeClass('active');
+                    
+                    // Email validation
+                    const emailField = form.find('input[type="email"]');
+                    if (emailField.val() && !isValidEmail(emailField.val())) {
+                        showFieldError(emailField, 'Please enter a valid email address');
+                        isValid = false;
+                    }
+                    
+                    // Tent preference validation
+                    const tentPreference = $('input[name="tent_preference"]:checked').val();
+                    if (tentPreference === 'specific' && !$('#selected-tent').val()) {
+                        showFieldError($('#tent-gallery'), 'Please select a tent');
+                        isValid = false;
+                    }
+                    
+                    if (!isValid) {
+                        $('html, body').animate({
+                            scrollTop: $('.error').first().offset().top - 100
+                        }, 500);
+                    }
+                    
+                    return isValid;
+                }
+                
+                function showFieldError(field, message) {
+                    field.addClass('error');
+                    const errorEl = $('<div class="error-message" style="color: #e74c3c; font-size: 14px; margin-top: 5px;">' + message + '</div>');
+                    field.after(errorEl);
+                }
+                
+                function isValidEmail(email) {
+                    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    return regex.test(email);
+                }
+                
+                function submitBookingForm(form) {
+                    const submitButton = form.find('button[type="submit"]');
+                    const originalText = submitButton.text();
+                    
+                    submitButton.prop('disabled', true).html('<span>Processing...</span>');
+                    
+                    const formData = new FormData(form[0]);
+                    formData.append('action', 'oktoberfest_submit_booking');
+                    
+                    $.ajax({
+                        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.success) {
+                                // Check if we have a redirect URL
+                                if (response.data && response.data.redirect_url) {
+                                    // Redirect to thank you page
+                                    window.location.href = response.data.redirect_url;
+                                } else {
+                                    // Show success message if no redirect URL
+                                    const message = response.data && response.data.message ? response.data.message : 'Booking submitted successfully!';
+                                    form.html('<div style="text-align: center; padding: 2rem; background: #4CAF50; color: white; border-radius: 8px;"><h3>Thank you!</h3><p>' + message + '</p></div>');
+                                }
+                            } else {
+                                alert('Error: ' + (response.data || 'Unknown error occurred'));
+                            }
+                        },
+                        error: function() {
+                            alert('Unable to process your request. Please try again later.');
+                        },
+                        complete: function() {
+                            submitButton.prop('disabled', false).html(originalText);
                         }
                     });
                 }
-
-                // Form submission
-                $('#reservation-form').on('submit', function(e) {
-                    e.preventDefault();
-
-                    // Validate form
-                    if (!$('#booking_date').val()) {
-                        alert('Please select a date');
-                        return;
-                    }
-
-                    if (!$('#tent').val()) {
-                        alert('Please select a tent');
-                        return;
-                    }
-
-                    // Get form values
-                    const date = $('#booking_date').val();
-                    const location = $('#tent').val();
-
-                    // Base64 encode the values as specified in the requirements
-                    const encodedDate = btoa(date);
-                    const encodedLocation = btoa(location);
-
-                    // Construct the URL with parameters
-                    const bookingUrl = '<?php echo esc_url($booking_page_url); ?>' +
-                        '?date=' + encodedDate +
-                        '&location=' + encodedLocation;
-
-                    // Redirect to booking page
-                    window.location.href = bookingUrl;
-                });
             });
         </script>
 <?php

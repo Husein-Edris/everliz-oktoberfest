@@ -143,7 +143,7 @@
             
             // Create weekday headers
             const daysHeader = $('<div class="calendar-days"></div>');
-            const weekdays = ['S', 'M', 'D', 'M', 'D', 'F', 'S']; // German weekday abbreviations
+            const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; // German weekday abbreviations
             weekdays.forEach(day => {
                 daysHeader.append(`<div>${day}</div>`);
             });

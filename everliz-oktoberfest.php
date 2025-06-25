@@ -38,6 +38,10 @@ class Oktoberfest_VIP_Booking
         add_action('admin_menu', [$this, 'add_admin_menu']);
         add_action('admin_init', [$this, 'register_settings']);
         add_action('admin_enqueue_scripts', [$this, 'admin_enqueue_scripts']);
+        
+        // Database setup
+        register_activation_hook(__FILE__, [$this, 'create_database_tables']);
+        add_action('upgrader_process_complete', [$this, 'create_database_tables']);
     }
 
     public function admin_enqueue_scripts($hook)
@@ -139,6 +143,15 @@ class Oktoberfest_VIP_Booking
             'oktoberfest-settings',
             [$this, 'render_settings_page'],
             'dashicons-calendar-alt'
+        );
+        
+        add_submenu_page(
+            'oktoberfest-settings',
+            'Booking Submissions',
+            'Submissions',
+            'manage_options',
+            'oktoberfest-submissions',
+            [$this, 'render_submissions_page']
         );
     }
 
@@ -546,6 +559,179 @@ jQuery(document).ready(function($) {
 </script>
 <?php
     }
+
+    /**
+     * Create database tables for storing submissions
+     */
+    public function create_database_tables()
+    {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'oktoberfest_submissions';
+
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            selected_date date NOT NULL,
+            attendees int(11) NOT NULL,
+            session varchar(50) NOT NULL,
+            tent_preference varchar(50) NOT NULL,
+            selected_tent varchar(100) DEFAULT '',
+            first_name varchar(100) NOT NULL,
+            last_name varchar(100) NOT NULL,
+            email varchar(100) NOT NULL,
+            phone varchar(50) NOT NULL,
+            company varchar(200) DEFAULT '',
+            message text DEFAULT '',
+            newsletter tinyint(1) DEFAULT 0,
+            submission_date datetime DEFAULT CURRENT_TIMESTAMP,
+            status varchar(20) DEFAULT 'new',
+            PRIMARY KEY (id),
+            KEY email (email),
+            KEY submission_date (submission_date),
+            KEY status (status)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+
+    /**
+     * Render submissions page
+     */
+    public function render_submissions_page()
+    {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'oktoberfest_submissions';
+
+        // Handle status updates
+        if (isset($_POST['update_status']) && isset($_POST['submission_id']) && isset($_POST['new_status'])) {
+            $submission_id = intval($_POST['submission_id']);
+            $new_status = sanitize_text_field($_POST['new_status']);
+            
+            $wpdb->update(
+                $table_name,
+                ['status' => $new_status],
+                ['id' => $submission_id]
+            );
+            
+            echo '<div class="notice notice-success"><p>Status updated successfully!</p></div>';
+        }
+
+        // Get submissions with pagination
+        $page = isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1;
+        $per_page = 20;
+        $offset = ($page - 1) * $per_page;
+
+        $total_submissions = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
+        $submissions = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM $table_name ORDER BY submission_date DESC LIMIT %d OFFSET %d",
+            $per_page,
+            $offset
+        ));
+
+        $total_pages = ceil($total_submissions / $per_page);
+
+        ?>
+        <div class="wrap">
+            <h1>Booking Submissions</h1>
+            
+            <div class="tablenav top">
+                <div class="alignleft actions">
+                    <span class="displaying-num"><?php echo $total_submissions; ?> items</span>
+                </div>
+                <?php if ($total_pages > 1): ?>
+                <div class="tablenav-pages">
+                    <?php
+                    $pagination = paginate_links([
+                        'base' => add_query_arg('paged', '%#%'),
+                        'format' => '',
+                        'prev_text' => '&laquo;',
+                        'next_text' => '&raquo;',
+                        'total' => $total_pages,
+                        'current' => $page,
+                        'type' => 'plain'
+                    ]);
+                    echo $pagination;
+                    ?>
+                </div>
+                <?php endif; ?>
+            </div>
+
+            <table class="wp-list-table widefat fixed striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Attendees</th>
+                        <th>Session</th>
+                        <th>Tent</th>
+                        <th>Newsletter</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($submissions)): ?>
+                        <tr>
+                            <td colspan="12" style="text-align: center; padding: 2rem;">
+                                No submissions found.
+                            </td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($submissions as $submission): ?>
+                            <tr>
+                                <td><?php echo $submission->id; ?></td>
+                                <td><?php echo $submission->selected_date; ?></td>
+                                <td><?php echo esc_html($submission->first_name . ' ' . $submission->last_name); ?></td>
+                                <td><?php echo esc_html($submission->email); ?></td>
+                                <td><?php echo esc_html($submission->phone); ?></td>
+                                <td><?php echo $submission->attendees; ?></td>
+                                <td><?php echo esc_html($submission->session); ?></td>
+                                <td><?php echo esc_html($submission->tent_preference === 'any' ? 'Any Tent' : $submission->selected_tent); ?></td>
+                                <td><?php echo $submission->newsletter ? '✓' : '✗'; ?></td>
+                                <td>
+                                    <span class="status-<?php echo $submission->status; ?>">
+                                        <?php echo ucfirst($submission->status); ?>
+                                    </span>
+                                </td>
+                                <td><?php echo date('Y-m-d H:i', strtotime($submission->submission_date)); ?></td>
+                                <td>
+                                    <form method="post" style="display: inline;">
+                                        <input type="hidden" name="submission_id" value="<?php echo $submission->id; ?>">
+                                        <select name="new_status" onchange="this.form.submit()">
+                                            <option value="new" <?php selected($submission->status, 'new'); ?>>New</option>
+                                            <option value="contacted" <?php selected($submission->status, 'contacted'); ?>>Contacted</option>
+                                            <option value="confirmed" <?php selected($submission->status, 'confirmed'); ?>>Confirmed</option>
+                                            <option value="cancelled" <?php selected($submission->status, 'cancelled'); ?>>Cancelled</option>
+                                        </select>
+                                        <input type="hidden" name="update_status" value="1">
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <style>
+        .status-new { color: #0073aa; font-weight: bold; }
+        .status-contacted { color: #f56e28; font-weight: bold; }
+        .status-confirmed { color: #46b450; font-weight: bold; }
+        .status-cancelled { color: #dc3232; font-weight: bold; }
+        </style>
+        <?php
+    }
 }
 
 // Initialize the plugin
@@ -610,13 +796,47 @@ function oktoberfest_handle_booking_submission() {
         return;
     }
     
-    // Use API handler to submit booking
-    require_once plugin_dir_path(__FILE__) . 'includes/class-api-handler.php';
-    $handler = \Everliz_Oktoberfest\API_Handler::instance();
+    // Save to local database
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'oktoberfest_submissions';
     
-    $result = $handler->submit_booking($booking_data);
+    $result = $wpdb->insert(
+        $table_name,
+        [
+            'selected_date' => $booking_data['selected_date'],
+            'attendees' => $booking_data['attendees'],
+            'session' => $booking_data['session'],
+            'tent_preference' => $booking_data['tent_preference'],
+            'selected_tent' => $booking_data['selected_tent'],
+            'first_name' => $booking_data['first_name'],
+            'last_name' => $booking_data['last_name'],
+            'email' => $booking_data['email'],
+            'phone' => $booking_data['phone'],
+            'company' => $booking_data['company'],
+            'message' => $booking_data['message'],
+            'newsletter' => $booking_data['newsletter'],
+            'submission_date' => current_time('mysql'),
+            'status' => 'new'
+        ],
+        [
+            '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s'
+        ]
+    );
     
-    if ($result['success']) {
+    if ($result !== false) {
+        $submission_id = $wpdb->insert_id;
+        
+        // Also try to send to external API if configured
+        require_once plugin_dir_path(__FILE__) . 'includes/class-api-handler.php';
+        $handler = \Everliz_Oktoberfest\API_Handler::instance();
+        if ($handler->is_configured()) {
+            $api_result = $handler->submit_booking($booking_data);
+            // Log API result but don't fail if API fails
+            if (!$api_result['success']) {
+                error_log('Oktoberfest API submission failed for submission ID ' . $submission_id . ': ' . ($api_result['message'] ?? 'Unknown error'));
+            }
+        }
+        
         // Get thank you page URL from settings
         $general_settings = get_option('oktoberfest_general_settings', []);
         $thank_you_page_id = $general_settings['thank_you_page'] ?? 0;
@@ -624,9 +844,11 @@ function oktoberfest_handle_booking_submission() {
         
         wp_send_json_success([
             'message' => 'Booking submitted successfully!',
+            'submission_id' => $submission_id,
             'redirect_url' => $thank_you_url
         ]);
     } else {
-        wp_send_json_error($result['message'] ?? 'Booking submission failed.');
+        error_log('Oktoberfest database insertion failed: ' . $wpdb->last_error);
+        wp_send_json_error('Failed to save booking. Please try again.');
     }
 }

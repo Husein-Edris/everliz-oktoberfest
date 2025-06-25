@@ -591,7 +591,8 @@ function oktoberfest_handle_booking_submission() {
         'email' => sanitize_email($_POST['email'] ?? ''),
         'phone' => sanitize_text_field($_POST['phone'] ?? ''),
         'company' => sanitize_text_field($_POST['company'] ?? ''),
-        'message' => sanitize_textarea_field($_POST['message'] ?? '')
+        'message' => sanitize_textarea_field($_POST['message'] ?? ''),
+        'newsletter' => isset($_POST['newsletter']) ? 1 : 0
     ];
     
     // Basic validation

@@ -287,6 +287,11 @@ class Booking_Form_Widget extends \Elementor\Widget_Base
                         <label for="message">Anything else you'd like to tell us?</label>
                         <textarea id="message" name="message" rows="5"></textarea>
                     </div>
+
+                    <div class="form-group checkbox">
+                        <input type="checkbox" id="newsletter" name="newsletter" value="1">
+                        <label for="newsletter"><?php echo __('Send me exclusive Oktoberfest tips, early bird deals, and special offers.', 'everliz-oktoberfest'); ?></label>
+                    </div>
                 </div>
 
                 <!-- Form submission button -->

@@ -48,10 +48,5 @@ npm run sass
 
 ## Support
 
-- Report issues via your project issue tracker.
 - **Author**: [Edris Husein](https://edrishusein.com)
 - **Version**: 1.5.0
-
-## License
-
-GPL v2 or later.

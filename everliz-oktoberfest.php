@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Oktoberfest VIP Booking
  * Description: Custom Elementor widgets for Oktoberfest VIP booking
- * Version: 2
+ * Version: 2.1.0   
  * Author: Edris Husein
  * Author URI: edrishusein.com
  */
@@ -314,25 +314,25 @@ class Oktoberfest_VIP_Booking
 
         $active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
 ?>
-        <div class="wrap oktoberfest-settings">
-            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+<div class="wrap oktoberfest-settings">
+    <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 
-            <h2 class="nav-tab-wrapper">
-                <a href="?page=oktoberfest-settings&tab=general"
-                    class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>">
-                    General Settings
-                </a>
-                <a href="?page=oktoberfest-settings&tab=date_ranges"
-                    class="nav-tab <?php echo $active_tab == 'date_ranges' ? 'nav-tab-active' : ''; ?>">
-                    Date Ranges
-                </a>
-                <a href="?page=oktoberfest-settings&tab=api"
-                    class="nav-tab <?php echo $active_tab == 'api' ? 'nav-tab-active' : ''; ?>">
-                    API Settings
-                </a>
-            </h2>
+    <h2 class="nav-tab-wrapper">
+        <a href="?page=oktoberfest-settings&tab=general"
+            class="nav-tab <?php echo $active_tab == 'general' ? 'nav-tab-active' : ''; ?>">
+            General Settings
+        </a>
+        <a href="?page=oktoberfest-settings&tab=date_ranges"
+            class="nav-tab <?php echo $active_tab == 'date_ranges' ? 'nav-tab-active' : ''; ?>">
+            Date Ranges
+        </a>
+        <a href="?page=oktoberfest-settings&tab=api"
+            class="nav-tab <?php echo $active_tab == 'api' ? 'nav-tab-active' : ''; ?>">
+            API Settings
+        </a>
+    </h2>
 
-            <?php
+    <?php
             if ($active_tab == 'general') {
                 $this->render_general_tab();
             } elseif ($active_tab == 'date_ranges') {
@@ -341,24 +341,24 @@ class Oktoberfest_VIP_Booking
                 $this->render_api_settings_tab();
             }
             ?>
-        </div>
-    <?php
+</div>
+<?php
     }
 
     private function render_general_tab()
     {
         $general_settings = get_option('oktoberfest_general_settings', []);
     ?>
-        <div class="general-settings-container">
-            <form method="post" action="options.php" class="oktoberfest-form">
-                <?php settings_fields('oktoberfest_general_settings'); ?>
-                <table class="form-table">
-                    <tr>
-                        <th scope="row">
-                            <label for="booking_page">Booking Page</label>
-                        </th>
-                        <td>
-                            <?php
+<div class="general-settings-container">
+    <form method="post" action="options.php" class="oktoberfest-form">
+        <?php settings_fields('oktoberfest_general_settings'); ?>
+        <table class="form-table">
+            <tr>
+                <th scope="row">
+                    <label for="booking_page">Booking Page</label>
+                </th>
+                <td>
+                    <?php
                             wp_dropdown_pages([
                                 'name' => 'oktoberfest_general_settings[booking_page]',
                                 'id' => 'booking_page',
@@ -368,26 +368,26 @@ class Oktoberfest_VIP_Booking
                                 'class' => 'regular-text'
                             ]);
                             ?>
-                            <p class="description">Select the page where your booking form is displayed.</p>
-                            <div class="page-actions">
-                                <a href="<?php echo admin_url('post-new.php?post_type=page'); ?>" class="button">Create New
-                                    Page</a>
-                                <?php if (!empty($general_settings['booking_page'])) : ?>
-                                    <a href="<?php echo get_edit_post_link($general_settings['booking_page']); ?>"
-                                        class="button">Edit
-                                        Page</a>
-                                    <a href="<?php echo get_permalink($general_settings['booking_page']); ?>" class="button"
-                                        target="_blank">View Page</a>
-                                <?php endif; ?>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            <label for="thank_you_page">Thank You Page (Danke Seite)</label>
-                        </th>
-                        <td>
-                            <?php
+                    <p class="description">Select the page where your booking form is displayed.</p>
+                    <div class="page-actions">
+                        <a href="<?php echo admin_url('post-new.php?post_type=page'); ?>" class="button">Create New
+                            Page</a>
+                        <?php if (!empty($general_settings['booking_page'])) : ?>
+                        <a href="<?php echo get_edit_post_link($general_settings['booking_page']); ?>"
+                            class="button">Edit
+                            Page</a>
+                        <a href="<?php echo get_permalink($general_settings['booking_page']); ?>" class="button"
+                            target="_blank">View Page</a>
+                        <?php endif; ?>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    <label for="thank_you_page">Thank You Page (Danke Seite)</label>
+                </th>
+                <td>
+                    <?php
                             wp_dropdown_pages([
                                 'name' => 'oktoberfest_general_settings[thank_you_page]',
                                 'id' => 'thank_you_page',
@@ -397,25 +397,25 @@ class Oktoberfest_VIP_Booking
                                 'class' => 'regular-text'
                             ]);
                             ?>
-                            <p class="description">Select the page to redirect to after successful form submission.</p>
-                            <div class="page-actions">
-                                <a href="<?php echo admin_url('post-new.php?post_type=page'); ?>" class="button">Create New
-                                    Page</a>
-                                <?php if (!empty($general_settings['thank_you_page'])) : ?>
-                                    <a href="<?php echo get_edit_post_link($general_settings['thank_you_page']); ?>"
-                                        class="button">Edit
-                                        Page</a>
-                                    <a href="<?php echo get_permalink($general_settings['thank_you_page']); ?>" class="button"
-                                        target="_blank">View Page</a>
-                                <?php endif; ?>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-                <?php submit_button('Save General Settings'); ?>
-            </form>
-        </div>
-    <?php
+                    <p class="description">Select the page to redirect to after successful form submission.</p>
+                    <div class="page-actions">
+                        <a href="<?php echo admin_url('post-new.php?post_type=page'); ?>" class="button">Create New
+                            Page</a>
+                        <?php if (!empty($general_settings['thank_you_page'])) : ?>
+                        <a href="<?php echo get_edit_post_link($general_settings['thank_you_page']); ?>"
+                            class="button">Edit
+                            Page</a>
+                        <a href="<?php echo get_permalink($general_settings['thank_you_page']); ?>" class="button"
+                            target="_blank">View Page</a>
+                        <?php endif; ?>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <?php submit_button('Save General Settings'); ?>
+    </form>
+</div>
+<?php
     }
 
     private function render_date_ranges_tab()
@@ -432,136 +432,136 @@ class Oktoberfest_VIP_Booking
             ]];
         }
     ?>
-        <div class="date-ranges-container">
-            <form method="post" action="options.php" class="oktoberfest-form">
-                <?php settings_fields('oktoberfest_date_ranges'); ?>
-                <div class="date-ranges-header">
-                    <div class="header-content">
-                        <h3>Event Date Ranges</h3>
-                        <p class="description">Set the date ranges for each year's Oktoberfest event.</p>
-                    </div>
-                    <div class="header-actions">
-                        <?php submit_button('Save Date Ranges', 'primary', 'submit', false); ?>
-                    </div>
-                </div>
-
-                <div class="date-ranges-table-container">
-                    <table id="oktoberfest-dates">
-                        <thead>
-                            <tr>
-                                <th>Year</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($date_ranges as $index => $range) : ?>
-                                <tr class="date-range-row">
-                                    <td>
-                                        <input type="number" name="oktoberfest_date_ranges[<?php echo $index; ?>][year]"
-                                            value="<?php echo esc_attr($range['year']); ?>" min="2025" max="2028" required>
-                                    </td>
-                                    <td>
-                                        <input type="date" name="oktoberfest_date_ranges[<?php echo $index; ?>][start_date]"
-                                            value="<?php echo esc_attr($range['start_date']); ?>" required>
-                                    </td>
-                                    <td>
-                                        <input type="date" name="oktoberfest_date_ranges[<?php echo $index; ?>][end_date]"
-                                            value="<?php echo esc_attr($range['end_date']); ?>" required>
-                                    </td>
-                                    <td>
-                                        <button type="button" class="button remove-date-range">
-                                            <span class="dashicons dashicons-trash"></span>
-                                            Remove
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="date-ranges-actions">
-                    <button type="button" class="button button-primary" id="add-date-range">
-                        <span class="dashicons dashicons-plus-alt2"></span>
-                        Add Date Range
-                    </button>
-                </div>
-            </form>
+<div class="date-ranges-container">
+    <form method="post" action="options.php" class="oktoberfest-form">
+        <?php settings_fields('oktoberfest_date_ranges'); ?>
+        <div class="date-ranges-header">
+            <div class="header-content">
+                <h3>Event Date Ranges</h3>
+                <p class="description">Set the date ranges for each year's Oktoberfest event.</p>
+            </div>
+            <div class="header-actions">
+                <?php submit_button('Save Date Ranges', 'primary', 'submit', false); ?>
+            </div>
         </div>
-    <?php
+
+        <div class="date-ranges-table-container">
+            <table id="oktoberfest-dates">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($date_ranges as $index => $range) : ?>
+                    <tr class="date-range-row">
+                        <td>
+                            <input type="number" name="oktoberfest_date_ranges[<?php echo $index; ?>][year]"
+                                value="<?php echo esc_attr($range['year']); ?>" min="2025" max="2028" required>
+                        </td>
+                        <td>
+                            <input type="date" name="oktoberfest_date_ranges[<?php echo $index; ?>][start_date]"
+                                value="<?php echo esc_attr($range['start_date']); ?>" required>
+                        </td>
+                        <td>
+                            <input type="date" name="oktoberfest_date_ranges[<?php echo $index; ?>][end_date]"
+                                value="<?php echo esc_attr($range['end_date']); ?>" required>
+                        </td>
+                        <td>
+                            <button type="button" class="button remove-date-range">
+                                <span class="dashicons dashicons-trash"></span>
+                                Remove
+                            </button>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="date-ranges-actions">
+            <button type="button" class="button button-primary" id="add-date-range">
+                <span class="dashicons dashicons-plus-alt2"></span>
+                Add Date Range
+            </button>
+        </div>
+    </form>
+</div>
+<?php
     }
 
     private function render_api_settings_tab()
     {
         $api_settings = get_option('oktoberfest_api_settings', []);
     ?>
-        <div class="api-settings-container">
-            <form method="post" action="options.php" class="oktoberfest-form">
-                <?php settings_fields('oktoberfest_api_settings'); ?>
-                <table class="form-table">
-                    <tr>
-                        <th scope="row">
-                            <label for="api_key">API Key</label>
-                        </th>
-                        <td>
-                            <input type="text" id="api_key" name="oktoberfest_api_settings[api_key]"
-                                value="<?php echo esc_attr($api_settings['api_key'] ?? ''); ?>" class="regular-text">
-                            <p class="description">Enter your API key for authentication.</p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            <label for="api_secret">API Secret</label>
-                        </th>
-                        <td>
-                            <input type="password" id="api_secret" name="oktoberfest_api_settings[api_secret]"
-                                value="<?php echo esc_attr($api_settings['api_secret'] ?? ''); ?>" class="regular-text">
-                            <p class="description">Enter your API secret key.</p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row">
-                            <label for="api_endpoint">API Endpoint</label>
-                        </th>
-                        <td>
-                            <input type="url" id="api_endpoint" name="oktoberfest_api_settings[api_endpoint]"
-                                value="<?php echo esc_url($api_settings['api_endpoint'] ?? ''); ?>" class="regular-text">
-                            <p class="description">Enter the API endpoint URL.</p>
-                        </td>
-                    </tr>
-                </table>
+<div class="api-settings-container">
+    <form method="post" action="options.php" class="oktoberfest-form">
+        <?php settings_fields('oktoberfest_api_settings'); ?>
+        <table class="form-table">
+            <tr>
+                <th scope="row">
+                    <label for="api_key">API Key</label>
+                </th>
+                <td>
+                    <input type="text" id="api_key" name="oktoberfest_api_settings[api_key]"
+                        value="<?php echo esc_attr($api_settings['api_key'] ?? ''); ?>" class="regular-text">
+                    <p class="description">Enter your API key for authentication.</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    <label for="api_secret">API Secret</label>
+                </th>
+                <td>
+                    <input type="password" id="api_secret" name="oktoberfest_api_settings[api_secret]"
+                        value="<?php echo esc_attr($api_settings['api_secret'] ?? ''); ?>" class="regular-text">
+                    <p class="description">Enter your API secret key.</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    <label for="api_endpoint">API Endpoint</label>
+                </th>
+                <td>
+                    <input type="url" id="api_endpoint" name="oktoberfest_api_settings[api_endpoint]"
+                        value="<?php echo esc_url($api_settings['api_endpoint'] ?? ''); ?>" class="regular-text">
+                    <p class="description">Enter the API endpoint URL.</p>
+                </td>
+            </tr>
+        </table>
 
-                <div style="margin: 20px 0;">
-                    <button type="button" class="button button-secondary" id="test-api-connection">Test API Connection</button>
-                    <span id="api-test-result" style="margin-left:1em;"></span>
-                </div>
-
-                <?php submit_button('Save API Settings'); ?>
-            </form>
+        <div style="margin: 20px 0;">
+            <button type="button" class="button button-secondary" id="test-api-connection">Test API Connection</button>
+            <span id="api-test-result" style="margin-left:1em;"></span>
         </div>
-        <script>
-            jQuery(document).ready(function($) {
-                $('#test-api-connection').on('click', function() {
-                    var $btn = $(this);
-                    var $result = $('#api-test-result');
-                    $result.text('Testing...');
-                    $btn.prop('disabled', true);
-                    $.post(ajaxurl, {
-                        action: 'oktoberfest_test_api_connection'
-                    }, function(response) {
-                        $btn.prop('disabled', false);
-                        if (response.success) {
-                            $result.html('<span style="color:green;">' + response.data + '</span>');
-                        } else {
-                            $result.html('<span style="color:red;">' + response.data + '</span>');
-                        }
-                    });
-                });
-            });
-        </script>
-    <?php
+
+        <?php submit_button('Save API Settings'); ?>
+    </form>
+</div>
+<script>
+jQuery(document).ready(function($) {
+    $('#test-api-connection').on('click', function() {
+        var $btn = $(this);
+        var $result = $('#api-test-result');
+        $result.text('Testing...');
+        $btn.prop('disabled', true);
+        $.post(ajaxurl, {
+            action: 'oktoberfest_test_api_connection'
+        }, function(response) {
+            $btn.prop('disabled', false);
+            if (response.success) {
+                $result.html('<span style="color:green;">' + response.data + '</span>');
+            } else {
+                $result.html('<span style="color:red;">' + response.data + '</span>');
+            }
+        });
+    });
+});
+</script>
+<?php
     }
 
     /**
@@ -642,16 +642,16 @@ class Oktoberfest_VIP_Booking
         $total_pages = ceil($total_submissions / $per_page);
 
     ?>
-        <div class="wrap">
-            <h1>Booking Submissions</h1>
+<div class="wrap">
+    <h1>Booking Submissions</h1>
 
-            <div class="tablenav top">
-                <div class="alignleft actions">
-                    <span class="displaying-num"><?php echo $total_submissions; ?> items</span>
-                </div>
-                <?php if ($total_pages > 1): ?>
-                    <div class="tablenav-pages">
-                        <?php
+    <div class="tablenav top">
+        <div class="alignleft actions">
+            <span class="displaying-num"><?php echo $total_submissions; ?> items</span>
+        </div>
+        <?php if ($total_pages > 1): ?>
+        <div class="tablenav-pages">
+            <?php
                         $pagination = paginate_links([
                             'base' => add_query_arg('paged', '%#%'),
                             'format' => '',
@@ -663,96 +663,96 @@ class Oktoberfest_VIP_Booking
                         ]);
                         echo $pagination;
                         ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-
-            <table class="wp-list-table widefat fixed striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Date</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Attendees</th>
-                        <th>Session</th>
-                        <th>Tent</th>
-                        <th>Newsletter</th>
-                        <th>Status</th>
-                        <th>Submitted</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($submissions)): ?>
-                        <tr>
-                            <td colspan="12" style="text-align: center; padding: 2rem;">
-                                No submissions found.
-                            </td>
-                        </tr>
-                    <?php else: ?>
-                        <?php foreach ($submissions as $submission): ?>
-                            <tr>
-                                <td><?php echo $submission->id; ?></td>
-                                <td><?php echo $submission->selected_date; ?></td>
-                                <td><?php echo esc_html($submission->first_name . ' ' . $submission->last_name); ?></td>
-                                <td><?php echo esc_html($submission->email); ?></td>
-                                <td><?php echo esc_html($submission->phone); ?></td>
-                                <td><?php echo $submission->attendees; ?></td>
-                                <td><?php echo esc_html($submission->session); ?></td>
-                                <td><?php echo esc_html($submission->tent_preference === 'any' ? 'Any Tent' : $submission->selected_tent); ?>
-                                </td>
-                                <td><?php echo $submission->newsletter ? '✓' : '✗'; ?></td>
-                                <td>
-                                    <span class="status-<?php echo $submission->status; ?>">
-                                        <?php echo ucfirst($submission->status); ?>
-                                    </span>
-                                </td>
-                                <td><?php echo date('Y-m-d H:i', strtotime($submission->submission_date)); ?></td>
-                                <td>
-                                    <form method="post" style="display: inline;">
-                                        <input type="hidden" name="submission_id" value="<?php echo $submission->id; ?>">
-                                        <select name="new_status" onchange="this.form.submit()">
-                                            <option value="new" <?php selected($submission->status, 'new'); ?>>New</option>
-                                            <option value="contacted" <?php selected($submission->status, 'contacted'); ?>>Contacted
-                                            </option>
-                                            <option value="confirmed" <?php selected($submission->status, 'confirmed'); ?>>Confirmed
-                                            </option>
-                                            <option value="cancelled" <?php selected($submission->status, 'cancelled'); ?>>Cancelled
-                                            </option>
-                                        </select>
-                                        <input type="hidden" name="update_status" value="1">
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
         </div>
+        <?php endif; ?>
+    </div>
 
-        <style>
-            .status-new {
-                color: #0073aa;
-                font-weight: bold;
-            }
+    <table class="wp-list-table widefat fixed striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Attendees</th>
+                <th>Session</th>
+                <th>Tent</th>
+                <th>Newsletter</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (empty($submissions)): ?>
+            <tr>
+                <td colspan="12" style="text-align: center; padding: 2rem;">
+                    No submissions found.
+                </td>
+            </tr>
+            <?php else: ?>
+            <?php foreach ($submissions as $submission): ?>
+            <tr>
+                <td><?php echo $submission->id; ?></td>
+                <td><?php echo $submission->selected_date; ?></td>
+                <td><?php echo esc_html($submission->first_name . ' ' . $submission->last_name); ?></td>
+                <td><?php echo esc_html($submission->email); ?></td>
+                <td><?php echo esc_html($submission->phone); ?></td>
+                <td><?php echo $submission->attendees; ?></td>
+                <td><?php echo esc_html($submission->session); ?></td>
+                <td><?php echo esc_html($submission->tent_preference === 'any' ? 'Any Tent' : $submission->selected_tent); ?>
+                </td>
+                <td><?php echo $submission->newsletter ? '✓' : '✗'; ?></td>
+                <td>
+                    <span class="status-<?php echo $submission->status; ?>">
+                        <?php echo ucfirst($submission->status); ?>
+                    </span>
+                </td>
+                <td><?php echo date('Y-m-d H:i', strtotime($submission->submission_date)); ?></td>
+                <td>
+                    <form method="post" style="display: inline;">
+                        <input type="hidden" name="submission_id" value="<?php echo $submission->id; ?>">
+                        <select name="new_status" onchange="this.form.submit()">
+                            <option value="new" <?php selected($submission->status, 'new'); ?>>New</option>
+                            <option value="contacted" <?php selected($submission->status, 'contacted'); ?>>Contacted
+                            </option>
+                            <option value="confirmed" <?php selected($submission->status, 'confirmed'); ?>>Confirmed
+                            </option>
+                            <option value="cancelled" <?php selected($submission->status, 'cancelled'); ?>>Cancelled
+                            </option>
+                        </select>
+                        <input type="hidden" name="update_status" value="1">
+                    </form>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
 
-            .status-contacted {
-                color: #f56e28;
-                font-weight: bold;
-            }
+<style>
+.status-new {
+    color: #0073aa;
+    font-weight: bold;
+}
 
-            .status-confirmed {
-                color: #46b450;
-                font-weight: bold;
-            }
+.status-contacted {
+    color: #f56e28;
+    font-weight: bold;
+}
 
-            .status-cancelled {
-                color: #dc3232;
-                font-weight: bold;
-            }
-        </style>
+.status-confirmed {
+    color: #46b450;
+    font-weight: bold;
+}
+
+.status-cancelled {
+    color: #dc3232;
+    font-weight: bold;
+}
+</style>
 <?php
     }
 }
